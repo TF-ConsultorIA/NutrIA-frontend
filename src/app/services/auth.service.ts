@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
-import { environment } from '../../environments/environment.development';
+import { environment } from '../../environments/environment';
 import { TokenService } from './token.service';
 import { AuthResponse, ChangeCredentialsResponse, ChangeEmailRequest, ChangePasswordRequest, LoginRequest, RefreshRequest, RegisterUserRequest, UserResponse } from '../models/auth';
 import { tap } from 'rxjs';

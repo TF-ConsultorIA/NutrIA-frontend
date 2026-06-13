@@ -7,7 +7,7 @@ export enum Role {
 export enum Gender {
   MALE = 'M',
   FEMALE = 'F',
-  NON_BINARY = 'NE'
+  NO_ESPECIFICADO = 'NE'
 }
 export enum UserType {
   YOUNGER = 'YOUNGER',

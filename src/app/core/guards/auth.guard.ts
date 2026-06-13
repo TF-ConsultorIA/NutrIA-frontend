@@ -4,9 +4,9 @@ import { TokenService } from '../../services/token.service';
 import { AuthService } from '../../services/auth.service';
 import { RefreshRequest } from '../../models/auth';
 import { of } from 'rxjs';
-import { switchMap, map, catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 
-export const authGuard: CanActivateFn = (route, state) => {
+export const authGuard: CanActivateFn = () => {
   const router = inject(Router);
   const tokenService = inject(TokenService);
   const authService = inject(AuthService);
@@ -23,12 +23,10 @@ export const authGuard: CanActivateFn = (route, state) => {
     return authService.refreshToken(request).pipe(
       map(() => true),
       catchError(() => {
-        router.navigate(['/auth/login']);
-        return of(false);
+        return of(router.createUrlTree(['/auth/login']));
       })
     );
   }
 
-  router.navigate(['/auth/login']);
-  return false;
+  return router.createUrlTree(['/auth/login']);
 };
