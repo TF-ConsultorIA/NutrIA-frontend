@@ -11,6 +11,7 @@
 html, body {
   min-height: 100%;
   font-family: 'Alexandria', sans-serif;
+  box-sizing: border-box;
 }
 
 body {

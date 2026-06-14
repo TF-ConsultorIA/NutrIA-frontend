@@ -1,14 +1,11 @@
+import { Gender } from "./gender";
+
 export enum Role {
   ADMIN = 'ADMIN',
   YOUNGER = 'YOUNGER',
   FAMILY = 'FAMILY'
 }
 
-export enum Gender {
-  MALE = 'M',
-  FEMALE = 'F',
-  NO_ESPECIFICADO = 'NE'
-}
 export enum UserType {
   YOUNGER = 'YOUNGER',
   FAMILY = 'FAMILY'
@@ -58,13 +55,3 @@ export interface ChangeCredentialsResponse {
   role: Role;
   accessExpiresInMs: number;
 }
-
-export interface UserResponse {
-  userId: number;
-  email: string;
-  name: string;
-  lastNames: string;
-  gender: Gender;
-  birthDate: string;
-}
-

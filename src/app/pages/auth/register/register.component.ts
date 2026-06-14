@@ -7,8 +7,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { AuthService } from '../../../services/auth.service';
-import { Gender, RegisterUserRequest, UserType } from '../../../models/auth';
+import { RegisterUserRequest, UserType } from '../../../models/auth';
 import { MatIconModule } from '@angular/material/icon';
+import { Gender } from '../../../models/gender';
 
 @Component({
   standalone: true,

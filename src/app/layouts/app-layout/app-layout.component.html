@@ -1,5 +1,76 @@
-<p>app-layout.component works!</p>
-<div>
-  <button matButton="filled" (click)="logout()">Logout</button>
+<mat-toolbar color="primary" class="nutria-navbar sticky top-0 z-50 flex-wrap justify-between">
+  <div class="flex items-center gap-2">
+    <button matIconButton [matMenuTriggerFor]="mobileMenu" class="mobile-menu-btn">
+      <mat-icon>menu</mat-icon>
+    </button>
+
+    <mat-menu #mobileMenu="matMenu">
+      <a mat-menu-item routerLink="/dashboard/home" routerLinkActive="text-[#1c3d2c] font-bold bg-[#A8F0C8]">
+        <mat-icon>home</mat-icon> Inicio
+      </a>
+      <a mat-menu-item routerLink="/recetas" routerLinkActive="text-[#1c3d2c] font-bold bg-[#A8F0C8]">
+        <mat-icon>search</mat-icon> Buscar recetas
+      </a>
+      <a mat-menu-item routerLink="/favoritos" routerLinkActive="text-[#1c3d2c] font-bold bg-[#A8F0C8]">
+        <mat-icon>favorite</mat-icon> Favoritos
+      </a>
+      <a mat-menu-item routerLink="/profile" routerLinkActive="text-[#1c3d2c] font-bold bg-[#A8F0C8]">
+        <mat-icon>person</mat-icon> Perfil
+      </a>
+      <a mat-menu-item routerLink="/plan" routerLinkActive="text-[#1c3d2c] font-bold bg-[#A8F0C8]">
+        <mat-icon>calendar_today</mat-icon> Plan semanal
+      </a>
+      <a mat-menu-item routerLink="/chatbot" routerLinkActive="text-[#1c3d2c] font-bold bg-[#A8F0C8]">
+        <mat-icon>smart_toy</mat-icon> Chatbot
+      </a>
+    </mat-menu>
+
+    <div class="brand-section">
+      <div class="logo-placeholder"><img src="nutria-logo.svg" alt="NutrIA Logo" /></div>
+      <span class="brand-name hidden sm:block">NutriA</span>
+      <span class="role-badge hidden md:block">Joven estudiante</span>
+    </div>
+  </div>
+
+  <div class="nav-links lg:flex">
+    <a mat-button routerLink="/dashboard/home" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}" class="nav-item">
+      <mat-icon>home</mat-icon> Inicio
+    </a>
+    <a mat-button routerLink="/recetas" routerLinkActive="active-link" class="nav-item">
+      <mat-icon>search</mat-icon> Buscar recetas
+    </a>
+    <a mat-button routerLink="/favoritos" routerLinkActive="active-link" class="nav-item">
+      <mat-icon>favorite</mat-icon> Favoritos
+    </a>
+    <a mat-button routerLink="/profile" routerLinkActive="active-link" class="nav-item">
+      <mat-icon>person</mat-icon> Perfil
+    </a>
+    <a mat-button routerLink="/plan" routerLinkActive="active-link" class="nav-item">
+      <mat-icon>calendar_today</mat-icon> Plan semanal
+    </a>
+    <a mat-button routerLink="/chatbot" routerLinkActive="active-link" class="nav-item">
+      <mat-icon>smart_toy</mat-icon> Chatbot
+    </a>
+  </div>
+
+  <div class="user-section">
+    <button mat-button [matMenuTriggerFor]="userMenu" class="user-btn p-1">
+      <span class="user-btn-content">
+        <div class="flex gap-2 text-white items-center">
+          <mat-icon>person</mat-icon>
+          <span class="user-name">{{ user?.name }}</span>
+        </div>
+        <mat-icon>keyboard_arrow_down</mat-icon>
+      </span>
+    </button>
+
+    <mat-menu #userMenu="matMenu">
+      <button mat-menu-item routerLink="/settings"><mat-icon>settings</mat-icon> Settings</button>
+      <button mat-menu-item (click)="logout()"><mat-icon>logout</mat-icon> Logout</button>
+    </mat-menu>
+  </div>
+</mat-toolbar>
+
+<div class="main-content">
+  <router-outlet></router-outlet>
 </div>
-<router-outlet></router-outlet>
