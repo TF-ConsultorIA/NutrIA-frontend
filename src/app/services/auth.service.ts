@@ -36,8 +36,10 @@ export class AuthService {
     );
   }
 
-  logout(request: RefreshRequest) {
-    return this.http.post(`${this.baseUrl}/logout`, request).pipe(
+  logout() {
+    let request: RefreshRequest = { refreshToken: this.token.refreshToken! };
+
+    return this.http.post<void>(`${this.baseUrl}/logout`, request).pipe(
       tap(() => {
         this.token.clear();
         this.isLoggedIn.set(false);

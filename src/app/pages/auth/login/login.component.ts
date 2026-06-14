@@ -39,7 +39,7 @@ export class LoginComponent {
 
     this.authService.login(request).subscribe({
       next: () => {
-        this.router.navigate(['/']);
+        this.router.navigate(['/dashboard/home']);
       },
       error: (err) => {
         this.errorMessage.set(err?.error?.message || 'No se pudo iniciar sesión.');

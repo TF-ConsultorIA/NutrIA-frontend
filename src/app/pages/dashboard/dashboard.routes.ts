@@ -3,7 +3,7 @@ import { DashboardYoungerComponent } from "./dashboard-younger/dashboard-younger
 
 export const routes: Routes = [
   {
-    path: 'younger/home',
+    path: 'home',
     component: DashboardYoungerComponent
   }
 ]
