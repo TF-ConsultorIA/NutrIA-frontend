@@ -1,0 +1,123 @@
+.nutria-navbar {
+  background: linear-gradient(
+    180deg,
+    rgba(45, 139, 87, 0.95) 30%,   /* #2D8B57 al 95% */
+    rgba(12, 48, 30, 0.936) 100%   /* #0A1E14 al 92% */
+  );
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  height: 72px;
+  padding: 0 24px;
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.brand-name {
+  font-size: 20px;
+  font-weight: 700;
+}
+.role-badge {
+  background-color: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  padding: 4px 15px;
+  font-size: 12px;
+  margin-left: 8px;
+}
+.logo-placeholder {
+  width: 32px;
+  height: 32px;
+  background-color: var(--nav-active-bg);
+  color: var(--nav-active-text);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.nav-item {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white !important;
+  border-radius: 24px;
+  font-weight: 500;
+  padding: 1.2rem 1.3rem !important;
+}
+.nav-item mat-icon {
+  margin-right: 6px;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.active-link {
+  background-color: #A8F0C8 !important;
+  color: var(--color-tertiary) !important;
+}
+
+.outlined-item {
+  border-color: var(--border-color) !important;
+}
+.outlined-item.active-link {
+  border-color: transparent !important;
+}
+
+.user-btn {
+  background-color: #a8f0c817 !important;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+.user-btn-content {
+  display: flex;
+  align-items: center;
+}
+.user-avatar {
+  width: 28px;
+  height: 28px;
+  background-color: var(--nav-active-bg);
+  color: var(--nav-active-text);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  margin-right: 8px;
+}
+.user-name {
+  margin-right: 4px;
+  font-size: 14px;
+}
+.user-btn-content mat-icon {
+  margin: 0;
+  color: white;
+}
+
+.mobile-menu-btn {
+  display: none !important;
+
+}
+
+@media (max-width: 1024px) {
+  .mobile-menu-btn {
+    display: inline-flex !important;
+  }
+
+  .nutria-navbar {
+    padding: 0 12px;
+  }
+
+  .nav-links {
+    display: none;
+  }
+}
