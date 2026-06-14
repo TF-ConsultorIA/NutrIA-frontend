@@ -1,0 +1,121 @@
+
+
+.auth-card {
+  width: min(100%, 30rem);
+  border-radius: 1.5rem;
+  padding: 0.5rem;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.24);
+  gap: 0.5rem;
+}
+
+.auth-header {
+  justify-content: center;
+  text-align: center;
+  padding-top: 1.5rem;
+}
+
+.auth-avatar {
+  display: grid;
+  place-items: center;
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+  font-weight: 700;
+  height: 4rem;
+  width: 4rem;
+
+  img {
+    padding: 0.25rem;
+    object-fit: contain;
+  }
+}
+
+.brand-accent {
+  color: var(--mat-sys-primary);
+}
+
+.role-grid {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.role-card {
+  width: 100%;
+  min-height: 5rem;
+  border-radius: 1rem;
+  padding: 1rem 1.25rem;
+  justify-content: flex-start;
+  gap: 1rem;
+}
+
+.role-card-elements {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+.role-card--primary {
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+}
+
+.role-copy {
+  display: grid;
+  text-align: left;
+}
+
+.role-copy small {
+  opacity: 0.82;
+}
+
+.step-topbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin: 1rem 0 0.5rem;
+}
+
+.step-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 0.35rem 0.8rem;
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.auth-form {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.auth-button {
+  border-radius: 9999px;
+  min-height: 3rem;
+}
+
+.auth-actions {
+  padding: 0 1.5rem 1.25rem;
+  justify-content: center;
+}
+
+.auth-link-copy {
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.auth-link {
+  color: var(--mat-sys-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.form-error {
+  margin: 0;
+  color: var(--mat-sys-error);
+}

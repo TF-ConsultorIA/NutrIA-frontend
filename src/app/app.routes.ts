@@ -1,3 +1,26 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard';
+import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component';
+import { noAuthGuard } from './core/guards/no-auth.guard';
+import { AppLayoutComponent } from './layouts/app-layout/app-layout.component';
 
-export const routes: Routes = [];
+export const routes: Routes = [
+  { path: '', redirectTo: '/auth/login', pathMatch: 'full' },
+  {
+    path: 'auth',
+    component: AuthLayoutComponent,
+    canActivate: [noAuthGuard],
+    loadChildren: () => import('./pages/auth/auth.routes').then((m) => m.routes),
+  },
+  {
+    path: '',
+    component: AppLayoutComponent,
+    canActivate: [authGuard],
+    children: [
+      {
+        path: 'dashboard',
+        loadChildren: () => import('./pages/dashboard/dashboard.routes').then((m) => m.routes),
+      },
+    ],
+  },
+];

@@ -1,0 +1,136 @@
+<div class="flex items-center justify-center min-h-screen px-4 py-8 md:px-8">
+  <mat-card class="auth-card">
+    <mat-card-header class="auth-header flex flex-col items-center">
+      <div mat-card-avatar class="auth-avatar" ><img src="nutria-logo.svg" alt="NutrIA Logo"/></div>
+      <mat-card-title><span class="text-3xl font-bold">Crear cuenta en <span class="brand-accent">NutrIA</span></span></mat-card-title>
+      <mat-card-subtitle><span class="text-sm">Completa tus datos para comenzar</span></mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (!selectedRole()) {
+        <div class="role-grid">
+          <button type="button" mat-stroked-button class="role-card" disabled>
+            <div class="role-card-elements">
+              <mat-icon>family_restroom</mat-icon>
+              <span class="role-copy">
+                <strong>Padre de familia</strong>
+                <small>Próximamente</small>
+              </span>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            mat-flat-button
+            color="primary"
+            class="role-card role-card--primary"
+            (click)="selectRole('student')"
+          >
+            <div class="role-card-elements">
+              <mat-icon>school</mat-icon>
+              <span class="role-copy">
+                <strong>Joven estudiante</strong>
+                <small>Acceso a herramientas de nutrición</small>
+              </span>
+            </div>
+          </button>
+        </div>
+      }
+
+      @if (selectedRole() === 'student') {
+        <div class="step-topbar">
+          <!-- <button type="button" mat-button (click)="goBack()">Volver al inicio</button> -->
+          <span class="step-chip flex gap-2"><mat-icon>school</mat-icon><span>Cuenta de estudiante</span></span>
+        </div>
+
+        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form">
+          <div class="grid gap-4 md:grid-cols-2">
+            <mat-form-field appearance="outline" class="w-full md:col-span-2">
+              <mat-label>Correo electrónico</mat-label>
+              <input
+                matInput
+                type="email"
+                formControlName="email"
+                placeholder="nombre@upc.edu.pe"
+              />
+              @if (registerForm.controls.email.touched && registerForm.controls.email.invalid) {
+                <mat-error>Ingresa un correo válido.</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Nombres</mat-label>
+              <input matInput type="text" formControlName="name" placeholder="Tus nombres" />
+              @if (registerForm.controls.name.touched && registerForm.controls.name.invalid) {
+                <mat-error>El nombre es obligatorio.</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Apellidos</mat-label>
+              <input matInput type="text" formControlName="lastNames" placeholder="Tus apellidos" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Fecha de nacimiento</mat-label>
+              <input matInput type="date" formControlName="birthDate" />
+              @if (
+                registerForm.controls.birthDate.touched && registerForm.controls.birthDate.invalid
+              ) {
+                <mat-error>La fecha de nacimiento es obligatoria.</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Género</mat-label>
+              <mat-select formControlName="gender">
+                @for (option of genderOptions; track option.value) {
+                  <mat-option [value]="option.value">{{ option.label }}</mat-option>
+                }
+              </mat-select>
+              @if (registerForm.controls.gender.touched && registerForm.controls.gender.invalid) {
+                <mat-error>Selecciona un género.</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="w-full md:col-span-2">
+              <mat-label>Contraseña</mat-label>
+              <input
+                matInput
+                type="password"
+                formControlName="password"
+                placeholder="Mínimo 8 caracteres"
+              />
+              @if (
+                registerForm.controls.password.touched && registerForm.controls.password.invalid
+              ) {
+                <mat-error>La contraseña debe tener al menos 8 caracteres.</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          @if (errorMessage()) {
+            <p class="form-error">{{ errorMessage() }}</p>
+          }
+
+          <button
+            mat-flat-button
+            color="primary"
+            type="submit"
+            class="auth-button w-full"
+            [disabled]="registerForm.invalid || isSubmitting()"
+          >
+            {{ isSubmitting() ? 'Creando cuenta...' : 'Crear cuenta' }}
+          </button>
+        </form>
+      }
+    </mat-card-content>
+
+    <mat-card-actions class="auth-actions">
+      <p class="auth-link-copy">
+        ¿Ya tienes cuenta?
+        <a routerLink="/auth/login" class="auth-link">Iniciar sesión</a>
+      </p>
+    </mat-card-actions>
+  </mat-card>
+</div>
