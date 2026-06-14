@@ -1,4 +1,4 @@
-<mat-toolbar color="primary" class="nutria-navbar">
+<mat-toolbar color="primary" class="nutria-navbar sticky top-0 z-50 flex-wrap justify-between">
   <div class="flex items-center gap-2">
     <button matIconButton [matMenuTriggerFor]="mobileMenu" class="mobile-menu-btn">
       <mat-icon>menu</mat-icon>
@@ -58,7 +58,7 @@
       <span class="user-btn-content">
         <div class="flex gap-2 text-white items-center">
           <mat-icon>person</mat-icon>
-          <span class="user-name">prueba</span>
+          <span class="user-name">{{ user?.name }}</span>
         </div>
         <mat-icon>keyboard_arrow_down</mat-icon>
       </span>

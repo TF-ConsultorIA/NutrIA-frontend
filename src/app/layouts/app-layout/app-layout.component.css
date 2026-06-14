@@ -1,8 +1,8 @@
 .nutria-navbar {
   background: linear-gradient(
     180deg,
-    rgba(45, 139, 87, 0.95) 30%,   /* #2D8B57 al 95% */
-    rgba(12, 48, 30, 0.936) 100%   /* #0A1E14 al 92% */
+    rgba(45, 139, 87) 30%,   /* #2D8B57 al 95% */
+    rgba(12, 48, 30) 100%   /* #0A1E14 al 92% */
   );
   color: white;
   display: flex;

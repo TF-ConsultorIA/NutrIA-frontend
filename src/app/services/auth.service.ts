@@ -2,8 +2,10 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { TokenService } from './token.service';
-import { AuthResponse, ChangeCredentialsResponse, ChangeEmailRequest, ChangePasswordRequest, LoginRequest, RefreshRequest, RegisterUserRequest, UserResponse } from '../models/auth';
-import { tap } from 'rxjs';
+import { AuthResponse, ChangeCredentialsResponse, ChangeEmailRequest, ChangePasswordRequest, LoginRequest, RefreshRequest, RegisterUserRequest } from '../models/auth';
+import { switchMap, tap } from 'rxjs';
+import { UserResponse } from '../models/user';
+import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root',
@@ -12,6 +14,7 @@ export class AuthService {
   private http = inject(HttpClient);
   private token = inject(TokenService);
   private baseUrl = `${environment.apiUrl}/auth`;
+  private userService = inject(UserService);
 
   isLoggedIn = signal(this.token.isLoggedIn);
 
@@ -21,6 +24,9 @@ export class AuthService {
         this.token.save(res.accessToken, res.refreshToken, res.email, res.role, res.accessExpiresInMs);
         this.isLoggedIn.set(true);
       }),
+      switchMap(() => {
+        return this.userService.getMe();
+      })
     );
   }
 
