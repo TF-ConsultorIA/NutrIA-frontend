@@ -1,0 +1,33 @@
+<div class="max-w-7xl mx-auto p-4 md:p-8 space-y-6 min-h-screen">
+  <div class="space-y-2">
+    <p class="text-xs font-bold uppercase tracking-widest text-primary">Explora Alimentos</p>
+    <h1 class="text-4xl font-black text-[#1c3d2c]">
+      Busca y descubre <span class="text-primary">recetas</span>
+    </h1>
+    <p class="text-gray-500 text-sm max-w-2xl leading-relaxed">
+      Consulta recetas y valores nutricionales de ingredientes. Todos los detalles con calorías,
+      proteínas, minerales y más.
+    </p>
+  </div>
+
+  <div class="flex gap-2 p-1 bg-[#E8F0EA] rounded-full max-w-xs border border-gray-200/50">
+    <button
+      routerLink="/food/plate"
+      routerLinkActive="bg-[#2D8B57] text-white shadow-sm"
+      class="flex-1 py-2 px-4 text-center text-xs font-bold rounded-full text-gray-600 transition-all cursor-pointer flex items-center justify-center gap-2"
+    >
+      <span class="material-icons text-sm">restaurant</span> Recetas
+    </button>
+    <button
+      routerLink="/food/ingredient"
+      routerLinkActive="bg-[#2D8B57] text-white shadow-sm"
+      class="flex-1 py-2 px-4 text-center text-xs font-bold rounded-full text-gray-600 transition-all cursor-pointer flex items-center justify-center gap-2"
+    >
+      <span class="material-icons text-sm">eco</span> Alimentos
+    </button>
+  </div>
+
+  <div class="pt-2">
+    <router-outlet></router-outlet>
+  </div>
+</div>
