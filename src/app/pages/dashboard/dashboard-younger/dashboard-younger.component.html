@@ -148,7 +148,7 @@
               <div class="flex items-center gap-2 text-xs">
                 @if (lastWeight()) {
                   <span class="text-gray-500"
-                    >Último:
+                    >{{ lastWeight()?.registerDate === (currentDate | date: 'yyyy-MM-dd') ? 'Hoy' : 'Último registro' }}:
                     <strong class="text-[#1c3d2c]">{{ lastWeight()?.weightKg }} kg</strong> •
                     {{ lastWeight()?.registerDate | date: 'dd-MMM' }}</span
                   >
@@ -159,7 +159,7 @@
                       <mat-icon class="scale-50 -mx-1">{{
                         weighChange()! > 0 ? 'trending_up' : 'trending_down'
                       }}</mat-icon>
-                      {{ weighChange()! }}
+                      {{ weighChange()! | number: '1.1-1' }} kg
                     </span>
                   }
                 }
@@ -182,7 +182,11 @@
             type="submit"
             class="bg-[#1c3d2c] hover:bg-primary text-white text-sm font-bold py-2 px-5 rounded-xl flex items-center gap-2 transition-colors cursor-pointer"
           >
+          @if (lastWeight()?.registerDate === (currentDate | date: 'yyyy-MM-dd')) {
+            <mat-icon class="scale-75">edit</mat-icon> Editar
+          } @else {
             <mat-icon class="scale-75">add</mat-icon> Registrar
+          }
           </button>
         </form>
       </div>
@@ -205,7 +209,7 @@
           <span class="text-xs font-bold">Peso</span>
         </div>
         <p class="text-2xl font-black text-[#1c3d2c]">
-          70 <span class="text-sm font-medium text-gray-500">kg</span>
+          {{ lastWeight()?.weightKg }} <span class="text-sm font-medium text-gray-500">kg</span>
         </p>
       </div>
 
@@ -214,7 +218,9 @@
           <mat-icon class="scale-75">straighten</mat-icon>
           <span class="text-xs font-bold">Altura</span>
         </div>
-        <p class="text-sm font-medium text-gray-400 mt-3">Sin datos</p>
+        <p class="text-sm font-medium text-gray-400 mt-3">
+          {{ userMetrics()?.height || 'Sin datos' }}
+        </p>
       </div>
 
       <div class="min-w-35 bg-white border border-gray-100 p-4 rounded-2xl opacity-70">
@@ -222,7 +228,9 @@
           <mat-icon class="scale-75">accessibility</mat-icon>
           <span class="text-xs font-bold">Pecho</span>
         </div>
-        <p class="text-sm font-medium text-gray-400 mt-3">Sin datos</p>
+        <p class="text-sm font-medium text-gray-400 mt-3">
+          {{ userMetrics()?.chest || 'Sin datos' }}
+        </p>
       </div>
 
       <div class="min-w-35 bg-white border border-gray-100 p-4 rounded-2xl opacity-70">
@@ -230,7 +238,9 @@
           <mat-icon class="scale-75">accessibility</mat-icon>
           <span class="text-xs font-bold">Brazos</span>
         </div>
-        <p class="text-sm font-medium text-gray-400 mt-3">Sin datos</p>
+        <p class="text-sm font-medium text-gray-400 mt-3">
+          {{ userMetrics()?.arm || 'Sin datos' }}
+        </p>
       </div>
     </div>
 
@@ -239,7 +249,7 @@
         <h4 class="font-bold text-[#1c3d2c] flex items-center gap-2">
           <mat-icon class="text-primary">trending_up</mat-icon> Evolución de peso
         </h4>
-        <span class="text-xs text-gray-400 font-bold">6 registros</span>
+        <span class="text-xs text-gray-400 font-bold">{{ userWeights().length }} registros</span>
       </div>
 
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
@@ -258,11 +268,7 @@
         <div class="bg-[#F0FDF4] p-3 rounded-xl border border-green-50">
           <p class="text-[10px] text-gray-500 font-bold mb-1">Evolución total</p>
           <p class="text-primary font-black text-lg">
-            {{
-              userWeights().length > 1
-                ? lastWeight()!.weightKg - userWeights()[0].weightKg + ' kg'
-                : 'Sin datos'
-            }}
+            {{ totalEvolution() }}
           </p>
         </div>
         <div class="bg-gray-50/50 p-3 rounded-xl border border-gray-100">
