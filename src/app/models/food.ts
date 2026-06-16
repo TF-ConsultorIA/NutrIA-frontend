@@ -7,6 +7,7 @@ export interface FoodResponse {
   id: number;
   foodName: string;
   foodType: FoodType;
+  foodGroup: string;
   energy: number;
   proteins: number;
   totalFat: number;

@@ -132,7 +132,7 @@ export class PlateSearchComponent implements OnInit {
       query: '',
       minCalories: null,
       maxCalories: null,
-      minProtein: null
+      minProtein: null,
     });
     this.triggerSearchFromZero();
   }
@@ -178,7 +178,7 @@ export class PlateSearchComponent implements OnInit {
       data: selectedFood,
       width: '440px',
       panelClass: 'custom-dialog-container',
-      disableClose: false
+      disableClose: false,
     });
   }
 }
