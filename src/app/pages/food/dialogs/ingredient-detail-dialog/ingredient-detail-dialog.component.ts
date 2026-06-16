@@ -1,29 +1,18 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, inject, signal } from '@angular/core';
 import { FoodResponse } from '../../../../models/food';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { CommonModule } from '@angular/common';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
-  selector: 'app-plate-detail-dialog.component',
-  imports: [ReactiveFormsModule, CommonModule, MatIconModule],
-  templateUrl: './plate-detail-dialog.component.html',
-  styleUrl: './plate-detail-dialog.component.css',
+  selector: 'app-ingredient-detail-dialog.component',
+  imports: [MatIconModule],
+  templateUrl: './ingredient-detail-dialog.component.html',
+  styleUrl: './ingredient-detail-dialog.component.css',
 })
-export class PlateDetailDialogComponent implements OnInit {
-  private fb = inject(FormBuilder);
-
-  public dialogRef = inject(MatDialogRef<PlateDetailDialogComponent>);
+export class IngredientDetailDialogComponent {
+  public dialogRef = inject(MatDialogRef<IngredientDetailDialogComponent>);
 
   public food: FoodResponse = inject(MAT_DIALOG_DATA);
-
-  planForm = this.fb.group({
-    day: [null, [Validators.required]],
-    timeSlot: [null, [Validators.required]],
-    amountGrams: [200, [Validators.required, Validators.min(1)]],
-  });
-
   public nutrients = signal<{ label: string; value: string }[]>([]);
 
   ngOnInit(): void {
@@ -56,16 +45,5 @@ export class PlateDetailDialogComponent implements OnInit {
 
   onCancel(): void {
     this.dialogRef.close(null);
-  }
-
-  onAdd(): void {
-    if (this.planForm.valid) {
-      const dataToSave = {
-        foodId: this.food.id,
-        ...this.planForm.value,
-      };
-
-      this.dialogRef.close(dataToSave);
-    }
   }
 }
