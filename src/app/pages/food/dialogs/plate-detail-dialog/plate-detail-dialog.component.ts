@@ -4,6 +4,7 @@ import { FoodResponse } from '../../../../models/food';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { MealPlanService } from '../../../../services/meal-plan.service';
 
 @Component({
   selector: 'app-plate-detail-dialog.component',
@@ -11,16 +12,30 @@ import { MatIconModule } from '@angular/material/icon';
   templateUrl: './plate-detail-dialog.component.html',
   styleUrl: './plate-detail-dialog.component.css',
 })
+
 export class PlateDetailDialogComponent implements OnInit {
   private fb = inject(FormBuilder);
+  private mealPlanService = inject(MealPlanService);
 
   public dialogRef = inject(MatDialogRef<PlateDetailDialogComponent>);
-
   public food: FoodResponse = inject(MAT_DIALOG_DATA);
 
+  // Days and times for dropdowns
+  public days = signal<string[]>([
+    'Lunes',
+    'Martes',
+    'Miércoles',
+    'Jueves',
+    'Viernes',
+    'Sábado',
+    'Domingo',
+  ]);
+
+  public times = signal<string[]>(['Desayuno', 'Almuerzo', 'Cena']);
+
   planForm = this.fb.group({
-    day: [null, [Validators.required]],
-    timeSlot: [null, [Validators.required]],
+    day: ['', [Validators.required]],
+    timeSlot: ['', [Validators.required]],
     amountGrams: [200, [Validators.required, Validators.min(1)]],
   });
 
@@ -28,6 +43,33 @@ export class PlateDetailDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.buildNutrientTable();
+    this.preFillFormFromMealPlan();
+  }
+
+  private preFillFormFromMealPlan(): void {
+    const selectedMeal = this.mealPlanService.getSelectedMealSlot();
+    
+    if (selectedMeal) {
+      console.log('Pre-filling form with:', selectedMeal);
+      
+      // Map day name from meal planner format (Lun, Mar, etc.) to full names
+      const dayMapping: { [key: string]: string } = {
+        'Lun': 'Lunes',
+        'Mar': 'Martes',
+        'Mié': 'Miércoles',
+        'Jue': 'Jueves',
+        'Vie': 'Viernes',
+        'Sáb': 'Sábado',
+        'Dom': 'Domingo',
+      };
+
+      const fullDayName = dayMapping[selectedMeal.dayName] || selectedMeal.dayName;
+
+      this.planForm.patchValue({
+        day: fullDayName,
+        timeSlot: selectedMeal.mealType,
+      });
+    }
   }
 
   private buildNutrientTable(): void {

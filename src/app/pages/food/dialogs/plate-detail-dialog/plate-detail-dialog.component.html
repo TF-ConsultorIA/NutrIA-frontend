@@ -64,9 +64,9 @@
             class="w-full bg-gray-50/50 border border-gray-200 rounded-xl py-2 px-3 text-sm text-gray-700 outline-none appearance-none focus:border-primary transition-colors"
           >
             <option [ngValue]="null" disabled selected hidden>Selecciona el día</option>
-            <option value="Lunes">Lunes</option>
-            <option value="Martes">Martes</option>
-            <option value="Miércoles">Miércoles</option>
+            @for (day of days(); track day) {
+              <option [value]="day">{{ day }}</option>
+            }
           </select>
           <mat-icon class="absolute right-3 top-2.5 text-gray-400 scale-75 pointer-events-none"
             >expand_more</mat-icon
@@ -79,9 +79,9 @@
             class="w-full bg-gray-50/50 border border-gray-200 rounded-xl py-2 px-3 text-sm text-gray-700 outline-none appearance-none focus:border-primary transition-colors"
           >
             <option [ngValue]="null" disabled selected hidden>Selecciona el horario</option>
-            <option value="Desayuno">Desayuno</option>
-            <option value="Almuerzo">Almuerzo</option>
-            <option value="Cena">Cena</option>
+            @for (time of times(); track time) {
+              <option [value]="time">{{ time }}</option>
+            }
           </select>
           <mat-icon class="absolute right-3 top-2.5 text-gray-400 scale-75 pointer-events-none"
             >expand_more</mat-icon

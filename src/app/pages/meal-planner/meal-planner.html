@@ -1,0 +1,65 @@
+<div class="container mx-auto px-6 py-8">
+  
+  <!-- Header Section -->
+  <div class="mb-8">
+    <p class="text-sm font-semibold text-teal-600 uppercase tracking-wide">
+      Planificación Semanal
+    </p>
+    <h1 class="text-4xl font-bold mb-2">
+      Plan semanal <span class="text-teal-500">calendario</span>
+    </h1>
+    <p class="text-gray-600">
+      Visualiza tu alimentación semana a semana. Las comidas se añaden
+      desde Buscar recetas.
+    </p>
+  </div>
+
+  <!-- Info Message -->
+  <div class="bg-gray-100 rounded-lg p-4 mb-6 flex items-center gap-3">
+    <span class="text-xl">ⓘ</span>
+    <p class="text-gray-600 text-sm">
+      Agrega comidas para ver el cálculo de calorías promedio.
+    </p>
+  </div>
+
+  <!-- Calendar Grid -->
+  <div class="bg-white rounded-lg shadow-sm p-6">
+    @if (loading()) {
+      <p class="text-center text-gray-500">Cargando semana...</p>
+    } @else if (error()) {
+      <p class="text-center text-red-500">{{ error() }}</p>
+    } @else {
+      <!-- Days header row -->
+      <div class="grid grid-cols-8 gap-4 mb-6">
+        <div></div>
+        @for (day of days(); track $index) {
+          <div class="text-center">
+            <p class="text-xs uppercase text-gray-400 font-semibold">{{ day.name }}</p>
+            <p class="font-semibold text-sm">{{ day.date }}</p>
+          </div>
+        }
+      </div>
+
+      <!-- Meal rows -->
+      @for (meal of times; track $index) {
+        <div class="grid grid-cols-8 gap-4 mb-4">
+          <div class="flex items-center">
+            <p class="text-sm font-medium text-gray-500">{{ meal }}</p>
+          </div>
+          @for (day of days(); track $index) {
+            <div 
+              class="h-24 border rounded-lg p-2 hover:bg-gray-100 cursor-pointer transition duration-200 bg-gray-50"
+              (click)="onMealBoxClick(day, meal)">
+            </div>
+          }
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Empty State -->
+  <p class="text-center text-gray-500 text-sm mt-6">
+    0 comidas en el plan · Pasa el cursor sobre una comida para ver info, editar o eliminar
+  </p>
+
+</div>
