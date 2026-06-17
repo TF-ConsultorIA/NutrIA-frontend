@@ -28,11 +28,10 @@ export class MealPlanner implements OnInit {
   mealPlans = signal<Map<string, FoodWeekPlanDetailResponse>>(new Map());
   totalComidas = computed(() => this.mealPlans().size);
 
-  
   constructor(
     private weeksService: WeeksService,
     private mealPlanService: MealPlanService,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit() {
@@ -75,7 +74,10 @@ export class MealPlanner implements OnInit {
     return `${date}_${mealType}`;
   }
 
-  getMealForSlot(dayData: { fullDate: string }, mealType: string): FoodWeekPlanDetailResponse | undefined {
+  getMealForSlot(
+    dayData: { fullDate: string },
+    mealType: string,
+  ): FoodWeekPlanDetailResponse | undefined {
     return this.mealPlans().get(this.slotKey(dayData.fullDate, mealType));
   }
 
@@ -86,7 +88,11 @@ export class MealPlanner implements OnInit {
       const date = new Date(week.startDate);
       date.setDate(date.getDate() + i);
       const fullDate = date.toISOString().split('T')[0];
-      newDays.push({ name: dayNames[i], date: `${date.getMonth() + 1}/${date.getDate()}`, fullDate });
+      newDays.push({
+        name: dayNames[i],
+        date: `${date.getMonth() + 1}/${date.getDate()}`,
+        fullDate,
+      });
     }
     this.days.set(newDays);
   }
@@ -108,7 +114,10 @@ export class MealPlanner implements OnInit {
   }
 
   private openMealDetailDialog(plan: FoodWeekPlanDetailResponse) {
-    const dialogRef = this.dialog.open(MealDetailDialogComponent, { data: plan });
+    const dialogRef = this.dialog.open(MealDetailDialogComponent, {
+      width: '440px',
+      data: plan,
+    });
     dialogRef.afterClosed().subscribe((result) => {
       if (result === 'updated' || result === 'deleted') {
         const weekId = this.currentWeek()?.id;
