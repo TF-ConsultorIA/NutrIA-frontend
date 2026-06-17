@@ -1,82 +1,168 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { catchError, debounceTime, distinctUntilChanged, filter, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
+import { PreferenceService } from '../../../services/preference.service';
+import { MedicalReportService } from '../../../services/medical-report.service';
+import { FoodService } from '../../../services/food.service';
+import { FoodResponse } from '../../../models/food';
+import { PreferenceItemDto } from '../../../models/preference';
+import { MedicalReportResponse } from '../../../models/medical-report';
+
+interface PreferenceDisplay {
+  id: number;
+  foodId: number;
+  foodName: string;
+}
 
 @Component({
   selector: 'app-profile-main',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [CommonModule, ReactiveFormsModule, MatIconModule, MatAutocompleteModule],
   templateUrl: './profile-main.component.html',
   styleUrl: './profile-main.component.css'
 })
-export class ProfileMainComponent {
+export class ProfileMainComponent implements OnInit {
+  private preferenceService = inject(PreferenceService);
+  private medicalService = inject(MedicalReportService);
+  private foodService = inject(FoodService);
+
   activeTab: 'medicos' | 'preferencias' = 'preferencias';
 
-  alergias: string[] = [];
-  alergiaInput: string = '';
+  alergias: PreferenceDisplay[] = [];
+  agrada: PreferenceDisplay[] = [];
+  noAgrada: PreferenceDisplay[] = [];
 
-  agrada: string[] = [];
-  agradaInput: string = '';
+  alergiaCtrl = new FormControl('');
+  agradaCtrl = new FormControl('');
+  noAgradaCtrl = new FormControl('');
 
-  noAgrada: string[] = [];
-  noAgradaInput: string = '';
+  alergiaResults$: Observable<FoodResponse[]>;
+  agradaResults$: Observable<FoodResponse[]>;
+  noAgradaResults$: Observable<FoodResponse[]>;
+
+  medicalReports: MedicalReportResponse[] = [];
+  isUploading = false;
+
+  constructor() {
+    this.alergiaResults$ = this.setupSearch(this.alergiaCtrl);
+    this.agradaResults$ = this.setupSearch(this.agradaCtrl);
+    this.noAgradaResults$ = this.setupSearch(this.noAgradaCtrl);
+  }
+
+  ngOnInit() {
+    this.loadPreferences();
+    this.loadMedicalReports();
+  }
 
   setActiveTab(tab: 'medicos' | 'preferencias') {
     this.activeTab = tab;
   }
 
-  addAlergia() {
-    const val = this.alergiaInput.trim();
-    if (val && !this.alergias.includes(val)) {
-      this.alergias.push(val);
-    }
-    this.alergiaInput = '';
+  private setupSearch(control: FormControl): Observable<FoodResponse[]> {
+    return control.valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      filter(val => typeof val === 'string' && val.length > 1),
+      switchMap(val => this.foodService.searchFoods(val, 0, 10).pipe(
+        map(res => res.content),
+        catchError(() => of([]))
+      ))
+    );
   }
 
-  removeAlergia(item: string) {
-    this.alergias = this.alergias.filter(a => a !== item);
+  displayFn(food: FoodResponse): string {
+    return food && food.foodName ? food.foodName : '';
   }
 
-  addAgrada() {
-    const val = this.agradaInput.trim();
-    if (val && !this.agrada.includes(val)) {
-      this.agrada.push(val);
-    }
-    this.agradaInput = '';
+  private loadPreferences() {
+    this.preferenceService.getPreferences().subscribe(res => {
+      this.resolveFoodNames(res.allergies).subscribe(data => this.alergias = data);
+      this.resolveFoodNames(res.liked).subscribe(data => this.agrada = data);
+      this.resolveFoodNames(res.disliked).subscribe(data => this.noAgrada = data);
+    });
   }
 
-  removeAgrada(item: string) {
-    this.agrada = this.agrada.filter(a => a !== item);
+  private resolveFoodNames(items: PreferenceItemDto[]): Observable<PreferenceDisplay[]> {
+    if (!items || items.length === 0) return of([]);
+    const requests = items.map(item => 
+      this.foodService.getFoodById(item.foodId).pipe(
+        map(food => ({
+          id: item.id,
+          foodId: item.foodId,
+          foodName: food.foodName
+        })),
+        catchError(() => of({ id: item.id, foodId: item.foodId, foodName: 'Desconocido' }))
+      )
+    );
+    return forkJoin(requests);
   }
 
-  addNoAgrada() {
-    const val = this.noAgradaInput.trim();
-    if (val && !this.noAgrada.includes(val)) {
-      this.noAgrada.push(val);
-    }
-    this.noAgradaInput = '';
+  onAlergiaSelected(event: MatAutocompleteSelectedEvent) {
+    const food: FoodResponse = event.option.value;
+    this.preferenceService.addPreference({ foodId: food.id, type: 'allergy' }).subscribe(pref => {
+      this.alergias.push({ id: pref.id, foodId: pref.foodId, foodName: food.foodName });
+      this.alergiaCtrl.setValue('');
+    });
   }
 
-  removeNoAgrada(item: string) {
-    this.noAgrada = this.noAgrada.filter(a => a !== item);
+  removeAlergia(item: PreferenceDisplay) {
+    this.preferenceService.deletePreference(item.id).subscribe(() => {
+      this.alergias = this.alergias.filter(a => a.id !== item.id);
+    });
   }
 
-  onAlergiaKey(event: KeyboardEvent) {
-    if (event.key === 'Enter') {
-      this.addAlergia();
-    }
+  onAgradaSelected(event: MatAutocompleteSelectedEvent) {
+    const food: FoodResponse = event.option.value;
+    this.preferenceService.addPreference({ foodId: food.id, type: 'liked' }).subscribe(pref => {
+      this.agrada.push({ id: pref.id, foodId: pref.foodId, foodName: food.foodName });
+      this.agradaCtrl.setValue('');
+    });
   }
 
-  onAgradaKey(event: KeyboardEvent) {
-    if (event.key === 'Enter') {
-      this.addAgrada();
-    }
+  removeAgrada(item: PreferenceDisplay) {
+    this.preferenceService.deletePreference(item.id).subscribe(() => {
+      this.agrada = this.agrada.filter(a => a.id !== item.id);
+    });
   }
 
-  onNoAgradaKey(event: KeyboardEvent) {
-    if (event.key === 'Enter') {
-      this.addNoAgrada();
+  onNoAgradaSelected(event: MatAutocompleteSelectedEvent) {
+    const food: FoodResponse = event.option.value;
+    this.preferenceService.addPreference({ foodId: food.id, type: 'disliked' }).subscribe(pref => {
+      this.noAgrada.push({ id: pref.id, foodId: pref.foodId, foodName: food.foodName });
+      this.noAgradaCtrl.setValue('');
+    });
+  }
+
+  removeNoAgrada(item: PreferenceDisplay) {
+    this.preferenceService.deletePreference(item.id).subscribe(() => {
+      this.noAgrada = this.noAgrada.filter(a => a.id !== item.id);
+    });
+  }
+
+  private loadMedicalReports() {
+    this.medicalService.getMedicalReports(0, 10).subscribe(res => {
+      this.medicalReports = res.content;
+    });
+  }
+
+  onFileSelected(event: any) {
+    const file: File = event.target.files[0];
+    if (file) {
+      this.isUploading = true;
+      const today = new Date().toISOString().split('T')[0];
+      this.medicalService.uploadReport(file, today).subscribe({
+        next: (report) => {
+          this.medicalReports.unshift(report);
+          this.isUploading = false;
+        },
+        error: () => {
+          this.isUploading = false;
+          alert('Error al subir el archivo');
+        }
+      });
     }
   }
 }

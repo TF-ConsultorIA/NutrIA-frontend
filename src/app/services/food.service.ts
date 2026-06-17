@@ -21,6 +21,12 @@ export class FoodService {
     return this.http.get<PageResponse<FoodResponse>>(`${this.baseUrl}/search`, { params: queryParams });
   }
 
+  searchFoods(query: string, page: number = 0, size: number = 10) {
+    const queryParams = new HttpParams().set('name', query).set('page', page).set('size', size);
+    return this.http.get<PageResponse<FoodResponse>>(`${this.baseUrl}/search`, { params: queryParams });
+  }
+
+
   getFoodById(id: number) {
     return this.http.get<FoodResponse>(`${this.baseUrl}/${id}`);
   }

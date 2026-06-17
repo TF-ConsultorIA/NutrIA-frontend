@@ -1,4 +1,4 @@
-<div class="profile-container w-full max-w-[1024px] mx-auto px-4 md:px-8 py-8 md:py-10 flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+<div class="profile-container w-full max-w-[1024px] mx-auto px-4 md:px-8 py-8 md:py-10 flex flex-col gap-8 fade-up-enter">
   <!-- Tab switcher -->
   <div class="tab-switcher flex gap-2 p-1 rounded-2xl w-fit" style="background: rgba(45,139,87,0.08);">
     <button
@@ -22,7 +22,7 @@
   </div>
 
   <!-- Content Preferencias -->
-  <div *ngIf="activeTab === 'preferencias'" class="flex flex-col gap-8 w-full animate-in fade-in duration-300">
+  <div *ngIf="activeTab === 'preferencias'" class="flex flex-col gap-8 w-full fade-up-enter delay-150">
     
     <!-- Alergias -->
     <div class="section-card w-full">
@@ -35,28 +35,27 @@
         
         <div *ngIf="alergias.length > 0" class="flex flex-wrap gap-2">
           <span *ngFor="let item of alergias" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[13px] bg-amber-50 text-amber-700 border border-amber-200">
-            {{ item }}
+            {{ item.foodName }}
             <button (click)="removeAlergia(item)" class="opacity-60 hover:opacity-100 transition-opacity flex items-center justify-center">
               <mat-icon style="font-size: 14px; width: 14px; height: 14px;">close</mat-icon>
             </button>
           </span>
         </div>
 
-        <div class="flex gap-2">
+        <div class="flex gap-2 w-full relative">
           <input
             type="text"
-            placeholder="Nueva alergia..."
-            [(ngModel)]="alergiaInput"
-            (keydown)="onAlergiaKey($event)"
-            class="flex-1 h-[39px] px-4 rounded-[14px] text-[14px] outline-none focus:border-[#2d8b57]"
+            placeholder="Buscar alimento (ej: Maní)..."
+            [formControl]="alergiaCtrl"
+            [matAutocomplete]="autoAlergia"
+            class="flex-1 h-[39px] px-4 rounded-[14px] text-[14px] outline-none focus:border-[#2d8b57] w-full"
             style="border: 0.917px solid #e5e7eb; color: rgba(10,10,10,0.8);"
           />
-          <button
-            (click)="addAlergia()"
-            class="w-12 h-[39px] bg-[#2d8b57] rounded-[14px] flex items-center justify-center hover:bg-[#256e46] transition-colors text-white shrink-0"
-          >
-            <mat-icon style="font-size: 20px; width: 20px; height: 20px;">add</mat-icon>
-          </button>
+          <mat-autocomplete #autoAlergia="matAutocomplete" [displayWith]="displayFn" (optionSelected)="onAlergiaSelected($event)">
+            <mat-option *ngFor="let food of alergiaResults$ | async" [value]="food">
+              {{ food.foodName }}
+            </mat-option>
+          </mat-autocomplete>
         </div>
       </div>
     </div>
@@ -72,28 +71,27 @@
         
         <div *ngIf="agrada.length > 0" class="flex flex-wrap gap-2">
           <span *ngFor="let item of agrada" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[13px] bg-emerald-50 text-emerald-700 border border-emerald-200">
-            {{ item }}
+            {{ item.foodName }}
             <button (click)="removeAgrada(item)" class="opacity-60 hover:opacity-100 transition-opacity flex items-center justify-center">
               <mat-icon style="font-size: 14px; width: 14px; height: 14px;">close</mat-icon>
             </button>
           </span>
         </div>
 
-        <div class="flex gap-2">
+        <div class="flex gap-2 w-full relative">
           <input
             type="text"
-            placeholder="Nuevo alimento..."
-            [(ngModel)]="agradaInput"
-            (keydown)="onAgradaKey($event)"
-            class="flex-1 h-[39px] px-4 rounded-[14px] text-[14px] outline-none focus:border-[#2d8b57]"
+            placeholder="Buscar alimento..."
+            [formControl]="agradaCtrl"
+            [matAutocomplete]="autoAgrada"
+            class="flex-1 h-[39px] px-4 rounded-[14px] text-[14px] outline-none focus:border-[#2d8b57] w-full"
             style="border: 0.917px solid #e5e7eb; color: rgba(10,10,10,0.8);"
           />
-          <button
-            (click)="addAgrada()"
-            class="w-12 h-[39px] bg-[#2d8b57] rounded-[14px] flex items-center justify-center hover:bg-[#256e46] transition-colors text-white shrink-0"
-          >
-            <mat-icon style="font-size: 20px; width: 20px; height: 20px;">add</mat-icon>
-          </button>
+          <mat-autocomplete #autoAgrada="matAutocomplete" [displayWith]="displayFn" (optionSelected)="onAgradaSelected($event)">
+            <mat-option *ngFor="let food of agradaResults$ | async" [value]="food">
+              {{ food.foodName }}
+            </mat-option>
+          </mat-autocomplete>
         </div>
       </div>
     </div>
@@ -109,51 +107,73 @@
         
         <div *ngIf="noAgrada.length > 0" class="flex flex-wrap gap-2">
           <span *ngFor="let item of noAgrada" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[13px] bg-red-50 text-red-700 border border-red-200">
-            {{ item }}
+            {{ item.foodName }}
             <button (click)="removeNoAgrada(item)" class="opacity-60 hover:opacity-100 transition-opacity flex items-center justify-center">
               <mat-icon style="font-size: 14px; width: 14px; height: 14px;">close</mat-icon>
             </button>
           </span>
         </div>
 
-        <div class="flex gap-2">
+        <div class="flex gap-2 w-full relative">
           <input
             type="text"
-            placeholder="Nuevo alimento..."
-            [(ngModel)]="noAgradaInput"
-            (keydown)="onNoAgradaKey($event)"
-            class="flex-1 h-[39px] px-4 rounded-[14px] text-[14px] outline-none focus:border-[#2d8b57]"
+            placeholder="Buscar alimento..."
+            [formControl]="noAgradaCtrl"
+            [matAutocomplete]="autoNoAgrada"
+            class="flex-1 h-[39px] px-4 rounded-[14px] text-[14px] outline-none focus:border-[#2d8b57] w-full"
             style="border: 0.917px solid #e5e7eb; color: rgba(10,10,10,0.8);"
           />
-          <button
-            (click)="addNoAgrada()"
-            class="w-12 h-[39px] bg-[#2d8b57] rounded-[14px] flex items-center justify-center hover:bg-[#256e46] transition-colors text-white shrink-0"
-          >
-            <mat-icon style="font-size: 20px; width: 20px; height: 20px;">add</mat-icon>
-          </button>
+          <mat-autocomplete #autoNoAgrada="matAutocomplete" [displayWith]="displayFn" (optionSelected)="onNoAgradaSelected($event)">
+            <mat-option *ngFor="let food of noAgradaResults$ | async" [value]="food">
+              {{ food.foodName }}
+            </mat-option>
+          </mat-autocomplete>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Content Informes Médicos -->
-  <div *ngIf="activeTab === 'medicos'" class="flex flex-col gap-6 w-full animate-in fade-in duration-300">
+  <div *ngIf="activeTab === 'medicos'" class="flex flex-col gap-6 w-full fade-up-enter delay-150">
     <!-- Header row -->
     <div class="flex items-center justify-between w-full flex-wrap gap-4">
       <div class="flex flex-col gap-1">
         <h2 class="text-[#1a2e23] whitespace-nowrap text-2xl font-bold m-0">Informes médicos</h2>
         <p class="text-[#5a7a68] text-sm m-0">Sube y gestiona archivos PDF de informes médicos</p>
       </div>
-      <button class="flex items-center justify-center gap-2 px-5 h-[41px] rounded-[14px] shrink-0 cursor-pointer transition-opacity hover:opacity-90 bg-[#2d8b57] text-white font-semibold text-sm shadow-sm border-none">
-        <mat-icon class="icon-sm">add</mat-icon>
-        Subir PDF
-      </button>
+      
+      <div>
+        <input type="file" id="fileUpload" class="hidden" accept=".pdf" (change)="onFileSelected($event)" />
+        <label for="fileUpload" class="flex items-center justify-center gap-2 px-5 h-[41px] rounded-[14px] shrink-0 cursor-pointer transition-opacity hover:opacity-90 bg-[#2d8b57] text-white font-semibold text-sm shadow-sm border-none">
+          <mat-icon class="icon-sm" *ngIf="!isUploading">add</mat-icon>
+          <mat-icon class="icon-sm animate-spin" *ngIf="isUploading">sync</mat-icon>
+          {{ isUploading ? 'Subiendo...' : 'Subir PDF' }}
+        </label>
+      </div>
     </div>
 
     <!-- Empty state -->
-    <div class="bg-white rounded-[20px] px-8 py-16 flex flex-col items-center gap-4 shadow-sm w-full" style="border: 0.917px solid rgba(45,139,87,0.12);">
+    <div *ngIf="medicalReports.length === 0" class="bg-white rounded-[20px] px-8 py-16 flex flex-col items-center gap-4 shadow-sm w-full" style="border: 0.917px solid rgba(45,139,87,0.12);">
       <mat-icon class="text-gray-300" style="font-size: 48px; width: 48px; height: 48px;">note_add</mat-icon>
       <p class="text-gray-400 text-base m-0 text-center">No hay informes médicos subidos.</p>
+    </div>
+
+    <!-- Medical Reports List -->
+    <div *ngIf="medicalReports.length > 0" class="flex flex-col gap-4">
+      <div *ngFor="let report of medicalReports" class="bg-white rounded-[14px] p-4 flex items-center justify-between shadow-sm border border-gray-100 hover:border-[#a8f0c8] transition-colors">
+        <div class="flex items-center gap-4">
+          <div class="w-10 h-10 rounded-full bg-[#f4f9f5] text-[#2d8b57] flex items-center justify-center">
+            <mat-icon>picture_as_pdf</mat-icon>
+          </div>
+          <div class="flex flex-col">
+            <span class="font-bold text-[#1a2e23] text-sm">Informe del {{ report.date | date:'dd/MM/yyyy' }}</span>
+            <span class="text-xs text-gray-500">Documento PDF</span>
+          </div>
+        </div>
+        <a [href]="report.documentUrl" target="_blank" class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-[#a8f0c8] hover:text-[#1a2e23] transition-colors cursor-pointer">
+          <mat-icon class="scale-75">download</mat-icon>
+        </a>
+      </div>
     </div>
   </div>
 
