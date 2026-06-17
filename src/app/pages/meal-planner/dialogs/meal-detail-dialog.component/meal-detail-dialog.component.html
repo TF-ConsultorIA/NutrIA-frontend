@@ -1,0 +1,78 @@
+<div class="bg-white rounded-3xl overflow-hidden max-w-md relative shadow-2xl flex flex-col max-h-[90vh]">
+  <div class="bg-linear-to-br from-[#53C285] to-primary p-8 flex flex-col items-center justify-center relative text-white">
+    <button
+      (click)="onClose()"
+      class="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/25 hover:bg-white/40 transition-colors flex items-center justify-center text-white cursor-pointer border-none outline-none"
+    >
+      <mat-icon class="scale-90">close</mat-icon>
+    </button>
+    <div class="w-14 h-14 text-white flex items-center justify-center">
+      <mat-icon class="scale-[2.5]">restaurant_menu</mat-icon>
+    </div>
+  </div>
+
+  <div class="overflow-y-auto p-6 space-y-6 scrollbar-hide flex-1">
+    <div class="space-y-1">
+      <h2 class="text-xl font-black text-[#1c3d2c] leading-tight">{{ plan.food.foodName }}</h2>
+      <p class="text-xs text-gray-400 font-semibold">{{ plan.timeDay }} · {{ plan.date }}</p>
+    </div>
+
+    <div class="space-y-3">
+      <h3 class="text-xs font-bold text-[#1c3d2c] tracking-wide uppercase">
+        Información nutricional <span class="text-gray-400 font-medium lowercase">(por 100g)</span>
+      </h3>
+      <div class="border border-gray-100 rounded-2xl overflow-hidden divide-y divide-gray-50 bg-gray-50/30">
+        @for (nutrient of nutrients(); track nutrient.label) {
+          <div class="flex justify-between items-center py-2.5 px-4 text-sm">
+            <span class="text-gray-500 font-medium">{{ nutrient.label }}</span>
+            <span class="text-[#1c3d2c] font-black">{{ nutrient.value }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="bg-white border border-gray-100 rounded-2xl p-4 shadow-xs space-y-3">
+      <div class="flex justify-between items-center">
+        <h3 class="text-xs font-bold text-[#1c3d2c] tracking-wide uppercase">Porción</h3>
+        @if (!editing()) {
+          <button type="button" (click)="toggleEdit()" class="text-xs font-bold text-primary hover:underline cursor-pointer">
+            Editar
+          </button>
+        }
+      </div>
+
+      @if (!editing()) {
+        <p class="text-lg font-black text-[#1c3d2c]">{{ plan.portion }} g</p>
+      } @else {
+        <form [formGroup]="portionForm" class="flex items-center gap-3">
+          <input
+            type="number"
+            formControlName="portion"
+            class="flex-1 bg-gray-50/50 border border-gray-200 rounded-xl py-2 px-3 text-sm text-gray-700 outline-none focus:border-primary transition-colors"
+          />
+          <button
+            type="button"
+            (click)="onSavePortion()"
+            [disabled]="portionForm.invalid || saving()"
+            class="py-2 px-4 bg-primary text-white font-bold text-xs rounded-xl hover:bg-[#236d44] transition-colors cursor-pointer disabled:opacity-50"
+          >
+            Guardar
+          </button>
+        </form>
+      }
+
+      @if (errorMsg()) {
+        <p class="text-xs text-red-500 font-medium">{{ errorMsg() }}</p>
+      }
+    </div>
+
+    <button
+      type="button"
+      (click)="onDelete()"
+      [disabled]="saving()"
+      class="w-full py-2.5 border border-red-200 text-red-500 font-bold text-xs rounded-xl hover:bg-red-50 transition-colors cursor-pointer disabled:opacity-50"
+    >
+      Eliminar del plan
+    </button>
+  </div>
+</div>
