@@ -7,7 +7,7 @@ import { catchError, debounceTime, distinctUntilChanged, filter, forkJoin, map, 
 import { PreferenceService } from '../../../services/preference.service';
 import { MedicalReportService } from '../../../services/medical-report.service';
 import { FoodService } from '../../../services/food.service';
-import { FoodResponse } from '../../../models/food';
+import { FoodResponse, FoodType } from '../../../models/food';
 import { PreferenceItemDto } from '../../../models/preference';
 import { MedicalReportResponse } from '../../../models/medical-report';
 
@@ -66,7 +66,7 @@ export class ProfileMainComponent implements OnInit {
       debounceTime(300),
       distinctUntilChanged(),
       filter(val => typeof val === 'string' && val.length > 1),
-      switchMap(val => this.foodService.searchFoods(val, 0, 10).pipe(
+      switchMap(val => this.foodService.searchPlates(val, FoodType.INGREDIENT, 0, 10).pipe(
         map(res => res.content),
         catchError(() => of([]))
       ))
