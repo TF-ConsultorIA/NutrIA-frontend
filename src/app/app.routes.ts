@@ -30,6 +30,10 @@ export const routes: Routes = [
       {
         path: 'meal-planner',
         loadChildren: () => import('./pages/meal-planner/meal-planner.routes').then((m) => m.routes),
+      },
+      {
+        path: 'profile',
+        loadChildren: () => import('./pages/profile/profile.routes').then((m) => m.routes),
       }
     ],
   },
