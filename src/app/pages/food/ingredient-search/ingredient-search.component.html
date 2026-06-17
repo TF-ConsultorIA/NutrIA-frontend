@@ -1,0 +1,156 @@
+<div class="space-y-6" [formGroup]="searchForm">
+  <div class="bg-white rounded-3xl p-6 shadow-xs border border-gray-100 space-y-6">
+    <div class="flex gap-3 items-center">
+      <div class="relative flex-1 flex items-center">
+        <mat-icon class="absolute left-4 text-gray-400">search</mat-icon>
+
+        <input
+          type="text"
+          formControlName="query"
+          placeholder="Buscar por nombre de ingrediente o alimento..."
+          class="w-full bg-gray-50/50 border border-gray-200 rounded-2xl py-3 pl-12 pr-12 text-sm text-gray-700 outline-none focus:border-primary focus:bg-white transition-all"
+        />
+
+        @if (searchForm.get('query')?.value) {
+          <button
+            type="button"
+            (click)="clearQueryField()"
+            class="absolute right-4 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer border-none bg-transparent flex items-center justify-center p-0"
+          >
+            <mat-icon class="scale-90">cancel</mat-icon>
+          </button>
+        }
+      </div>
+
+      <button
+        type="button"
+        (click)="onSearch()"
+        class="bg-primary text-white font-bold text-sm px-6 py-3 rounded-xl hover:bg-[#236d44] transition-colors cursor-pointer shadow-xs"
+      >
+        Buscar
+      </button>
+    </div>
+  </div>
+
+  <div class="flex justify-between items-center pt-2">
+    <h3 class="text-xl font-black text-[#1c3d2c]">
+      {{ results()?.totalElements || 0 }} alimentos encontrados
+    </h3>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    @for (item of results()?.content || []; track item.id) {
+      <div
+        class="bg-white rounded-3xl p-4 shadow-xs border border-gray-100 flex flex-col justify-between group hover:shadow-md transition-all"
+      >
+        <div
+          class="w-full h-32 bg-linear-to-br rounded-2xl relative flex items-center justify-center text-white/30 mb-4 {{
+            item.randomBg
+          }}"
+        >
+          <div
+            class="absolute bottom-3 left-3 bg-white/20 backdrop-blur-md text-white text-[9px] font-black tracking-wider uppercase px-3 py-1 rounded-full border border-white/20 flex items-center gap-1 shadow-xs max-w-35 truncate"
+          >
+            <span class="w-1.5 h-1.5 rounded-full bg-white shrink-0"></span>
+            {{ item.foodGroup }}
+          </div>
+
+          <mat-icon class="scale-[2.2]">eco</mat-icon>
+
+          <div
+            class="absolute top-3 right-3 bg-white/20 backdrop-blur-md text-white text-[11px] font-black px-2.5 py-1 rounded-full flex items-center gap-0.5"
+          >
+            <mat-icon class="scale-50 -ml-1">local_fire_department</mat-icon>
+            {{ item.energy }} kcal
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <h4
+              class="font-black text-[#1c3d2c] text-base leading-tight group-hover:text-primary transition-colors min-h-10 line-clamp-2"
+            >
+              {{ item.foodName }}
+            </h4>
+            <p class="text-[10px] font-bold text-gray-400 tracking-wider uppercase">
+              Por cada 100g
+            </p>
+          </div>
+
+          <div
+            class="grid grid-cols-3 gap-2 bg-gray-50/50 p-2.5 rounded-xl text-center border border-gray-100/50"
+          >
+            <div>
+              <span class="block text-[10px] font-bold text-gray-400 uppercase">Prot</span>
+              <span class="text-xs font-black text-[#1c3d2c]"
+                >{{ item.proteins ? (item.proteins | number: '1.2-2') : 'N/A' }} g</span
+              >
+            </div>
+            <div>
+              <span class="block text-[10px] font-bold text-gray-400 uppercase">Grasas</span>
+              <span class="text-xs font-black text-[#1c3d2c]"
+                >{{ item.totalFat ? (item.totalFat | number: '1.2-2') : 'N/A' }} g</span
+              >
+            </div>
+            <div>
+              <span class="block text-[10px] font-bold text-gray-400 uppercase">Carbs</span>
+              <span class="text-xs font-black text-[#1c3d2c]"
+                >{{
+                  item.carbohydratesTotal ? (item.carbohydratesTotal | number: '1.2-2') : 'N/A'
+                }}
+                g</span
+              >
+            </div>
+          </div>
+
+          <a
+            (click)="openIngredientDetail(item)"
+            class="text-primary text-xs font-bold flex items-center gap-1 pt-1 cursor-pointer hover:underline"
+          >
+            Ver tabla completa <mat-icon class="scale-50 -ml-1">chevron_right</mat-icon>
+          </a>
+        </div>
+      </div>
+    } @empty {
+      <div class="col-span-full text-center py-12 text-gray-400 text-sm">
+        No se encontraron ingredientes con los criterios seleccionados.
+      </div>
+    }
+  </div>
+
+  @if (totalPages() > 1) {
+    <div class="flex items-center justify-center gap-4 pt-8 pb-4">
+      <button
+        (click)="goToPage(currentPage() - 1)"
+        [disabled]="currentPage() === 0"
+        class="w-12 h-12 rounded-full bg-white shadow-sm border border-gray-100 text-gray-400 flex justify-center items-center hover:bg-gray-50 hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
+      >
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+
+      <div class="flex items-center gap-1 bg-gray-100/50 p-1.5 rounded-2xl border border-gray-100">
+        @for (page of pageNumbers(); track page) {
+          <button
+            (click)="goToPage(page - 1)"
+            [class]="
+              currentPage() === page - 1
+                ? 'bg-primary text-white shadow-md'
+                : 'text-gray-500 hover:bg-white hover:text-primary'
+            "
+            class="w-10 h-10 text-sm font-bold rounded-xl transition-all cursor-pointer flex justify-center items-center"
+          >
+            {{ page }}
+          </button>
+        }
+      </div>
+
+      <button
+        (click)="goToPage(currentPage() + 1)"
+        [disabled]="currentPage() === totalPages() - 1"
+        class="w-12 h-12 rounded-full bg-white shadow-sm border border-gray-100 text-gray-400 flex justify-center items-center hover:bg-gray-50 hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
+      >
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+    </div>
+  }
+</div>

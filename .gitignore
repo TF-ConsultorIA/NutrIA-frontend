@@ -38,6 +38,8 @@ yarn-error.log
 testem.log
 /typings
 __screenshots__/
+Informe_medico/
+Preferences_Design/
 
 # System files
 .DS_Store

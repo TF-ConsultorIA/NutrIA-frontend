@@ -1,0 +1,50 @@
+<div class="flex items-center justify-center min-h-screen px-4 py-8 md:px-8">
+  <mat-card class="auth-card">
+    <mat-card-header class="auth-header flex flex-col items-center">
+      <div mat-card-avatar class="auth-avatar" ><img src="nutria-logo.svg" alt="NutrIA Logo"/></div>
+      <mat-card-title><span class="text-3xl font-bold">Bienvenido a <span class="brand-accent">NutrIA</span></span></mat-card-title>
+      <mat-card-subtitle><span class="text-sm">Inicia sesión para continuar</span></mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Correo electrónico</mat-label>
+          <input matInput type="email" formControlName="email" placeholder="usuario@nutria.com" />
+          @if (loginForm.controls.email.touched && loginForm.controls.email.invalid) {
+            <mat-error>Ingresa un correo válido.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Contraseña</mat-label>
+          <input matInput type="password" formControlName="password" placeholder="Tu contraseña" />
+          @if (loginForm.controls.password.touched && loginForm.controls.password.invalid) {
+            <mat-error>La contraseña es obligatoria.</mat-error>
+          }
+        </mat-form-field>
+
+        @if (errorMessage()) {
+          <p class="form-error">{{ errorMessage() }}</p>
+        }
+
+        <button
+          mat-flat-button
+          color="primary"
+          type="submit"
+          class="auth-button w-full"
+          [disabled]="loginForm.invalid"
+        >
+          Iniciar sesión
+        </button>
+      </form>
+    </mat-card-content>
+
+    <mat-card-actions class="auth-actions">
+      <p class="auth-link-copy">
+        ¿No tienes cuenta?
+        <a routerLink="/auth/register" class="auth-link">Crear cuenta</a>
+      </p>
+    </mat-card-actions>
+  </mat-card>
+</div>

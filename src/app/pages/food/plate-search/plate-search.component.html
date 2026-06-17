@@ -1,0 +1,175 @@
+<div class="space-y-6" [formGroup]="searchForm">
+  <div class="bg-white rounded-3xl p-6 shadow-xs border border-gray-100 space-y-6">
+    <div class="flex gap-3 items-center">
+      <div class="relative flex-1 flex items-center">
+        <mat-icon class="absolute left-4 text-gray-400">search</mat-icon>
+
+        <input
+          type="text"
+          formControlName="query"
+          placeholder="Buscar por nombre de receta..."
+          class="w-full bg-gray-50/50 border border-gray-200 rounded-2xl py-3 pl-12 pr-12 text-sm text-gray-700 outline-none focus:border-primary focus:bg-white transition-all"
+        />
+
+        @if (searchForm.get('query')?.value) {
+          <button
+            type="button"
+            (click)="clearQueryField()"
+            class="absolute right-4 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer border-none bg-transparent flex items-center justify-center p-0"
+          >
+            <mat-icon class="scale-90">cancel</mat-icon>
+          </button>
+        }
+      </div>
+
+      <button
+        type="button"
+        (click)="onSearch()"
+        class="bg-primary text-white font-bold text-sm px-6 py-3 rounded-xl hover:bg-primary/90 transition-colors cursor-pointer shadow-xs"
+      >
+        Buscar
+      </button>
+    </div>
+
+    <div class="space-y-3">
+      <div class="flex justify-between items-center">
+        <h4 class="text-xs font-bold text-primary tracking-widest uppercase">
+          Filtros Nutricionales
+        </h4>
+
+        @if (hasActiveFilters()) {
+          <button
+            type="button"
+            (click)="resetAllFilters()"
+            class="text-xs font-bold text-gray-400 hover:text-red-500 transition-colors flex items-center gap-1 cursor-pointer bg-transparent border-none"
+          >
+            <mat-icon class="scale-75">restart_alt</mat-icon> Limpiar filtros
+          </button>
+        }
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-[11px] font-bold text-gray-400 mb-1">Calorías mínimas</label>
+          <input
+            type="number"
+            formControlName="minCalories"
+            placeholder="Ej: 300"
+            class="w-full bg-gray-50/50 border border-gray-200 rounded-xl py-2 px-3 text-sm outline-none focus:border-primary focus:bg-white transition-colors"
+          />
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-gray-400 mb-1">Calorías máximas</label>
+          <input
+            type="number"
+            formControlName="maxCalories"
+            placeholder="Ej: 500"
+            class="w-full bg-gray-50/50 border border-gray-200 rounded-xl py-2 px-3 text-sm outline-none focus:border-primary focus:bg-white transition-colors"
+          />
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-gray-400 mb-1"
+            >Proteínas mínimas (g)</label
+          >
+          <input
+            type="number"
+            formControlName="minProtein"
+            placeholder="Ej: 20"
+            class="w-full bg-gray-50/50 border border-gray-200 rounded-xl py-2 px-3 text-sm outline-none focus:border-primary focus:bg-white transition-colors"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex justify-between items-center pt-2">
+    <h3 class="text-xl font-black text-[#1c3d2c]">
+      {{ results()?.totalElements }} recetas encontradas
+    </h3>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    @for (recipe of results()?.content; track recipe.id) {
+      <div
+        class="bg-white rounded-3xl p-4 shadow-xs border border-gray-100 flex flex-col justify-between group hover:shadow-md transition-all"
+      >
+        <div
+          class="w-full h-36 bg-linear-to-br rounded-2xl relative flex items-center justify-center text-white/40 mb-4 {{
+            recipe.randomBg
+          }}"
+        >
+          <mat-icon class="scale-[2]">restaurant_menu</mat-icon>
+
+          <button
+            (click)="addFavorite(recipe.id)"
+            class="absolute top-3 left-3 w-8 Fly h-8 rounded-full hover:translate-0.5 bg-white flex justify-center items-center shadow-xs cursor-pointer transition-transform active:scale-95 text-amber-500"
+          >
+            <mat-icon class="scale-90"> star </mat-icon>
+          </button>
+        </div>
+
+        <div class="space-y-3">
+          <h4
+            class="font-black text-[#1c3d2c] text-base leading-tight group-hover:text-primary transition-colors min-h-10 line-clamp-2"
+          >
+            {{ recipe.foodName }}
+          </h4>
+
+          <div class="flex items-center gap-4 text-xs font-medium">
+            <span class="flex items-center gap-1 text-amber-500/80">
+              <mat-icon class="scale-75">local_fire_department</mat-icon>
+              <span class="text-gray-400">{{ recipe.energy }} kcal (por 100g)</span>
+            </span>
+          </div>
+
+          <a
+            (click)="openRecipeDetail(recipe)"
+            class="text-primary text-xs font-bold flex items-center gap-1 pt-1 cursor-pointer hover:underline"
+          >
+            Ver detalles <mat-icon class="scale-50 -ml-1">chevron_right</mat-icon>
+          </a>
+        </div>
+      </div>
+    } @empty {
+      <div class="col-span-full text-center py-12 text-gray-400 text-sm">
+        No se encontraron recetas con los filtros seleccionados.
+      </div>
+    }
+  </div>
+
+  @if (totalPages() > 1) {
+    <div class="flex items-center justify-center gap-4 pt-8 pb-4">
+      <button
+        (click)="goToPage(currentPage() - 1)"
+        [disabled]="currentPage() === 0"
+        class="w-12 h-12 rounded-full bg-white shadow-sm border border-gray-100 text-gray-400 flex justify-center items-center hover:bg-gray-50 hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
+      >
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+
+      <div class="flex items-center gap-1 bg-gray-100/50 p-1.5 rounded-2xl border border-gray-100">
+        @for (page of pageNumbers(); track page) {
+          <button
+            (click)="goToPage(page - 1)"
+            [class]="
+              currentPage() === page - 1
+                ? 'bg-primary text-white shadow-md'
+                : 'text-gray-500 hover:bg-white hover:text-primary'
+            "
+            class="w-10 h-10 text-sm font-bold rounded-xl transition-all cursor-pointer flex justify-center items-center"
+          >
+            {{ page }}
+          </button>
+        }
+      </div>
+
+      <button
+        (click)="goToPage(currentPage() + 1)"
+        [disabled]="currentPage() === totalPages() - 1"
+        class="w-12 h-12 rounded-full bg-white shadow-sm border border-gray-100 text-gray-400 flex justify-center items-center hover:bg-gray-50 hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
+      >
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+    </div>
+  }
+</div>

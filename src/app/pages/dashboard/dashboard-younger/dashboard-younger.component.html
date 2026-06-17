@@ -1,0 +1,316 @@
+<div
+  animate.enter="fade-up-enter"
+  class="max-w-350 mx-auto p-4 md:p-6 lg:p-8 space-y-8 min-h-screen bg-[#F9FBF9]"
+>
+  <div
+    class="relative bg-linear-to-br from-[#1c3d2c] to-[#152e21] rounded-3xl p-6 md:p-10 overflow-hidden shadow-lg"
+  >
+    <div class="absolute -top-24 -right-24 w-96 h-96 bg-white/5 rounded-full blur-2xl"></div>
+
+    <div class="relative z-10">
+      <p
+        class="text-[#A8F0C8] text-xs md:text-sm font-bold tracking-widest uppercase mb-4 opacity-90"
+      >
+        Panel Principal • {{ currentDate | date: 'fullDate' }}
+      </p>
+
+      <h1 class="text-4xl md:text-5xl font-extrabold text-white leading-tight mb-4">
+        ¡Buenas noches,<br />
+        <span class="text-[#A8F0C8]">{{ user?.name | titlecase }}</span>
+      </h1>
+
+      <p class="text-white/80 max-w-lg mb-8 text-sm md:text-base">
+        Aquí tienes un resumen de tu progreso corporal y tus comidas planificadas para hoy.
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div
+          class="bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl p-4 flex items-center gap-4"
+        >
+          <div
+            class="w-10 h-10 rounded-full bg-white/20 flex justify-center items-center text-white shrink-0"
+          >
+            <mat-icon class="scale-75">monitor_weight</mat-icon>
+          </div>
+          <div>
+            <p class="text-white/70 text-xs">Peso actual</p>
+            <p class="text-white font-bold text-lg leading-tight">
+              {{ lastWeight() ? lastWeight()?.weightKg + ' kg' : 'Sin registros' }}
+            </p>
+          </div>
+        </div>
+
+        <div
+          class="bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl p-4 flex items-center gap-4"
+        >
+          <div
+            class="w-10 h-10 rounded-full bg-white/20 flex justify-center items-center text-white shrink-0"
+          >
+            <mat-icon class="scale-75">show_chart</mat-icon>
+          </div>
+          <div>
+            <p class="text-white/70 text-xs">Registros</p>
+            <p class="text-white font-bold text-lg leading-tight">{{ userWeights().length }}</p>
+            <p class="text-white/70 text-xs">de peso</p>
+          </div>
+        </div>
+
+        <div
+          class="bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl p-4 flex items-center gap-4"
+        >
+          <div
+            class="w-10 h-10 rounded-full bg-white/20 flex justify-center items-center text-white shrink-0"
+          >
+            <mat-icon class="scale-75">calendar_today</mat-icon>
+          </div>
+          <div>
+            <p class="text-white/70 text-xs">Última actualización</p>
+            <p class="text-white font-bold text-lg leading-tight">
+              {{ lastWeight() ? (lastWeight()?.registerDate | date: 'dd-MMM') : 'Sin registros' }}
+            </p>
+            <p class="text-white/70 text-xs">métricas</p>
+          </div>
+        </div>
+
+        <div
+          class="bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl p-4 flex items-center gap-4"
+        >
+          <div
+            class="w-10 h-10 rounded-full bg-white/20 flex justify-center items-center text-white shrink-0"
+          >
+            <mat-icon class="scale-75">local_fire_department</mat-icon>
+          </div>
+          <div>
+            <p class="text-white/70 text-xs">Racha</p>
+            <p class="text-white font-bold text-lg leading-tight">
+              {{ currentStreak() }} día{{ currentStreak() > 1 ? 's' : '' }}
+            </p>
+            <p class="text-white/70 text-xs">consecutivos</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="space-y-3">
+      <h3 class="text-xs font-bold text-primary tracking-widest uppercase flex items-center gap-1">
+        <mat-icon class="scale-75">local_fire_department</mat-icon> Racha de uso
+      </h3>
+      <div
+        class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex items-center justify-between gap-5 h-29"
+      >
+        <div class="flex items-center gap-4">
+          <div
+            class="border-2 border-gray-100 rounded-xl w-16 h-16 flex flex-col justify-center items-center shrink-0"
+            [ngClass]="currentStreak() > 0 ? 'text-yellow-600' : 'text-gray-500'"
+          >
+            <span class="text-2xl font-black leading-none">{{ currentStreak() }}</span>
+            <span class="text-[10px] font-bold">DIA{{ currentStreak() > 1 ? 'S' : '' }}</span>
+          </div>
+          <div>
+            <h4
+              class="font-bold flex items-center gap-1 text-base mb-0.5"
+              [ngClass]="currentStreak() > 0 ? 'text-primary' : 'text-gray-500'"
+            >
+              <mat-icon class="scale-75">local_fire_department</mat-icon>
+              {{ currentStreak() }} día{{ currentStreak() > 1 ? 's' : '' }} de racha
+            </h4>
+            @if (currentStreak() > 0) {
+              <p class="text-gray-500 text-sm">¡Genial! Mantén la racha para seguir motivado.</p>
+            } @else {
+              <p class="text-gray-500 text-sm">Empezaste una racha. ¡Sigue así!</p>
+            }
+          </div>
+        </div>
+        <div class="text-gray-300">
+          <mat-icon class="scale-125">local_fire_department</mat-icon>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-3">
+      <h3 class="text-xs font-bold text-primary tracking-widest uppercase flex items-center gap-1">
+        <mat-icon class="scale-75">scale</mat-icon> Registro de peso diario
+      </h3>
+      <div
+        class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 space-y-4 h-29 flex flex-col justify-center"
+      >
+        <div class="flex justify-between items-center w-full">
+          <div class="flex items-center gap-3 w-full">
+            <div
+              class="w-10 h-10 rounded-full bg-[#A8F0C8]/30 text-primary flex justify-center items-center shrink-0"
+            >
+              <mat-icon class="scale-75">monitor_weight</mat-icon>
+            </div>
+            <div class="flex justify-between items-center w-full">
+              <h4 class="font-bold text-[#1c3d2c] text-base">Registro de peso del día</h4>
+              <div class="flex items-center gap-2 text-xs">
+                @if (lastWeight()) {
+                  <span class="text-gray-500"
+                    >{{ lastWeight()?.registerDate === (currentDate | date: 'yyyy-MM-dd') ? 'Hoy' : 'Último registro' }}:
+                    <strong class="text-[#1c3d2c]">{{ lastWeight()?.weightKg }} kg</strong> •
+                    {{ lastWeight()?.registerDate | date: 'dd-MMM' }}</span
+                  >
+                  @if (weighChange() !== null) {
+                    <span
+                      class="bg-[#A8F0C8]/30 text-primary px-2 py-0.5 rounded-md font-bold flex items-center gap-0.5"
+                    >
+                      <mat-icon class="scale-50 -mx-1">{{
+                        weighChange()! > 0 ? 'trending_up' : 'trending_down'
+                      }}</mat-icon>
+                      {{ weighChange()! | number: '1.1-1' }} kg
+                    </span>
+                  }
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <form [formGroup]="weightForm" (submit)="registerWeight()" class="flex gap-3 items-center">
+          <div class="relative flex-1">
+            <input
+              type="text"
+              placeholder="Ej: 68.5"
+              class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-4 text-sm text-gray-700 outline-none focus:border-primary transition-colors"
+              formControlName="weightKg"
+            />
+            <span class="absolute right-4 top-2 text-gray-400 text-sm font-medium">kg</span>
+          </div>
+          <button
+            type="submit"
+            class="bg-[#1c3d2c] hover:bg-primary text-white text-sm font-bold py-2 px-5 rounded-xl flex items-center gap-2 transition-colors cursor-pointer"
+          >
+          @if (lastWeight()?.registerDate === (currentDate | date: 'yyyy-MM-dd')) {
+            <mat-icon class="scale-75">edit</mat-icon> Editar
+          } @else {
+            <mat-icon class="scale-75">add</mat-icon> Registrar
+          }
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="space-y-4 pt-4 border-t border-gray-200">
+    <div>
+      <h3 class="text-xs font-bold text-primary tracking-widest uppercase">Progreso</h3>
+      <h2 class="text-2xl font-black text-[#1c3d2c]">Métricas corporales</h2>
+      <p class="text-gray-500 text-sm">
+        Registra tu peso del día y revisa cómo evolucionan tus medidas en el tiempo.
+      </p>
+    </div>
+
+    <div class="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+      <div class="min-w-35 bg-[#F0FDF4] border border-[#A8F0C8] p-4 rounded-2xl">
+        <div class="flex items-center gap-2 text-primary mb-2">
+          <mat-icon class="scale-75">monitor_weight</mat-icon>
+          <span class="text-xs font-bold">Peso</span>
+        </div>
+        <p class="text-2xl font-black text-[#1c3d2c]">
+          {{ lastWeight()?.weightKg }} <span class="text-sm font-medium text-gray-500">kg</span>
+        </p>
+      </div>
+
+      <div class="min-w-35 bg-white border border-gray-100 p-4 rounded-2xl opacity-70">
+        <div class="flex items-center gap-2 text-gray-400 mb-2">
+          <mat-icon class="scale-75">straighten</mat-icon>
+          <span class="text-xs font-bold">Altura</span>
+        </div>
+        <p class="text-sm font-medium text-gray-400 mt-3">
+          {{ userMetrics()?.height || 'Sin datos' }}
+        </p>
+      </div>
+
+      <div class="min-w-35 bg-white border border-gray-100 p-4 rounded-2xl opacity-70">
+        <div class="flex items-center gap-2 text-gray-400 mb-2">
+          <mat-icon class="scale-75">accessibility</mat-icon>
+          <span class="text-xs font-bold">Pecho</span>
+        </div>
+        <p class="text-sm font-medium text-gray-400 mt-3">
+          {{ userMetrics()?.chest || 'Sin datos' }}
+        </p>
+      </div>
+
+      <div class="min-w-35 bg-white border border-gray-100 p-4 rounded-2xl opacity-70">
+        <div class="flex items-center gap-2 text-gray-400 mb-2">
+          <mat-icon class="scale-75">accessibility</mat-icon>
+          <span class="text-xs font-bold">Brazos</span>
+        </div>
+        <p class="text-sm font-medium text-gray-400 mt-3">
+          {{ userMetrics()?.arm || 'Sin datos' }}
+        </p>
+      </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+      <div class="flex justify-between items-center mb-6">
+        <h4 class="font-bold text-[#1c3d2c] flex items-center gap-2">
+          <mat-icon class="text-primary">trending_up</mat-icon> Evolución de peso
+        </h4>
+        <span class="text-xs text-gray-400 font-bold">{{ userWeights().length }} registros</span>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+        <div class="bg-blue-50/50 p-3 rounded-xl border border-blue-50">
+          <p class="text-[10px] text-gray-500 font-bold mb-1">Mínimo registrado</p>
+          <p class="text-blue-600 font-black text-lg">
+            {{ minimumWeight() !== null ? minimumWeight() + ' kg' : 'Sin datos' }}
+          </p>
+        </div>
+        <div class="bg-red-50/50 p-3 rounded-xl border border-red-50">
+          <p class="text-[10px] text-gray-500 font-bold mb-1">Máximo registrado</p>
+          <p class="text-red-600 font-black text-lg">
+            {{ maximumWeight() !== null ? maximumWeight() + ' kg' : 'Sin datos' }}
+          </p>
+        </div>
+        <div class="bg-[#F0FDF4] p-3 rounded-xl border border-green-50">
+          <p class="text-[10px] text-gray-500 font-bold mb-1">Evolución total</p>
+          <p class="text-primary font-black text-lg">
+            {{ totalEvolution() }}
+          </p>
+        </div>
+        <div class="bg-gray-50/50 p-3 rounded-xl border border-gray-100">
+          <p class="text-[10px] text-gray-500 font-bold mb-1">Registros totales</p>
+          <p class="text-[#1c3d2c] font-black text-lg">
+            {{ userWeights().length }}
+          </p>
+        </div>
+      </div>
+
+      <div class="w-full relative flex items-end justify-between px-4 pb-2 pt-2">
+        @if (hasData()) {
+          <div class="w-full">
+            <apx-chart
+              [series]="chartOptions.series!"
+              [chart]="chartOptions.chart!"
+              [xaxis]="chartOptions.xaxis!"
+              [yaxis]="chartOptions.yaxis!"
+              [stroke]="chartOptions.stroke!"
+              [markers]="chartOptions.markers!"
+              [grid]="chartOptions.grid!"
+              [theme]="chartOptions.theme!"
+            >
+            </apx-chart>
+          </div>
+        } @else {
+          <div
+            class="flex flex-col items-center justify-center text-center p-8 border-2 border-dashed border-gray-200 rounded-2xl w-full bg-gray-50/50"
+          >
+            <div
+              class="w-12 h-12 rounded-full bg-gray-100 flex justify-center items-center text-gray-400 mb-3"
+            >
+              <mat-icon class="scale-125">analytics</mat-icon>
+            </div>
+            <h5 class="text-gray-700 font-bold text-base mb-1">Sin datos de progreso</h5>
+            <p class="text-gray-400 text-sm max-w-xs">
+              Aún no has registrado tu peso. Realiza tu primer registro diario arriba para comenzar
+              a ver tu curva de evolución.
+            </p>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
