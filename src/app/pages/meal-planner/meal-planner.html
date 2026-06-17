@@ -14,13 +14,14 @@
     </p>
   </div>
 
-  <!-- Info Message -->
+  <!-- Info Message 
   <div class="bg-gray-100 rounded-lg p-4 mb-6 flex items-center gap-3">
     <span class="text-xl">ⓘ</span>
     <p class="text-gray-600 text-sm">
       Agrega comidas para ver el cálculo de calorías promedio.
     </p>
   </div>
+  -->
 
   <!-- Calendar Grid -->
   <div class="bg-white rounded-lg shadow-sm p-6">
@@ -43,23 +44,31 @@
       <!-- Meal rows -->
       @for (meal of times; track $index) {
         <div class="grid grid-cols-8 gap-4 mb-4">
-          <div class="flex items-center">
+            <div class="flex items-center">
             <p class="text-sm font-medium text-gray-500">{{ meal }}</p>
-          </div>
-          @for (day of days(); track $index) {
-            <div 
-              class="h-24 border rounded-lg p-2 hover:bg-gray-100 cursor-pointer transition duration-200 bg-gray-50"
-              (click)="onMealBoxClick(day, meal)">
             </div>
-          }
+            @for (day of days(); track $index) {
+            <div
+                class="h-24 border rounded-lg p-2 hover:shadow-md cursor-pointer transition duration-200 flex flex-col justify-center"
+                [class.bg-gray-50]="!getMealForSlot(day, meal)"
+                [class.bg-teal-50]="getMealForSlot(day, meal)"
+                [class.border-teal-200]="getMealForSlot(day, meal)"
+                (click)="onMealBoxClick(day, meal)"
+            >
+                @if (getMealForSlot(day, meal); as plan) {
+                <p class="text-xs font-bold text-teal-700 truncate">{{ plan.food.foodName }}</p>
+                <p class="text-[10px] text-gray-400">{{ plan.portion }}g · {{ plan.food.energy }} kcal</p>
+                }
+            </div>
+            }
         </div>
-      }
+        }
     }
   </div>
 
   <!-- Empty State -->
   <p class="text-center text-gray-500 text-sm mt-6">
-    0 comidas en el plan · Pasa el cursor sobre una comida para ver info, editar o eliminar
+  {{ totalComidas() }} {{ totalComidas() === 1 ? 'comida' : 'comidas' }} en el plan · Pasa el cursor sobre una comida para ver info, editar o eliminar
   </p>
 
 </div>
