@@ -26,6 +26,10 @@ export const routes: Routes = [
         path: 'food',
         component: FoodSearchWrapperComponent,
         loadChildren: () => import('./pages/food/food.routes').then((m) => m.routes),
+      },
+      {
+        path: 'meal-planner',
+        loadChildren: () => import('./pages/meal-planner/meal-planner.routes').then((m) => m.routes),
       }
     ],
   },
