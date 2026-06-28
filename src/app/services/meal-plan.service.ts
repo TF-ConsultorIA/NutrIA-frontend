@@ -8,6 +8,7 @@ import {
   FoodWeekPlanResponse,
   UpdatePortionRequest,
 } from '../models/food-week-plan';
+import { Week } from '../models/week';
 
 export interface SelectedMealSlot {
   date: string;
@@ -48,5 +49,9 @@ export class MealPlanService {
 
   deleteMeal(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+  
+  getCurrentWeek(): Observable<Week> {
+    return this.http.get<Week>(`${environment.apiUrl}/weeks/current`);
   }
 }

@@ -8,6 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MealPlanService } from '../../../../services/meal-plan.service';
 import { UserService } from '../../../../services/user.service';
 import { Router } from '@angular/router';
+import { Week } from '../../../../models/week';
 
 @Component({
   selector: 'app-plate-detail-dialog.component',
@@ -83,45 +84,54 @@ private readonly timeDayMap: Record<string, TimeDay> = {
   }
 
   onAdd(): void {
-    if (this.planForm.invalid) return;
+  if (this.planForm.invalid) return;
 
-    const slot = this.mealPlanService.getSelectedMealSlot();
-    if (!slot) {
-      this.saveError.set('No se encontró el día/horario seleccionado. Vuelve al calendario e intenta de nuevo.');
-      return;
-    }
+  const userId = this.userService.currentUser()?.userId;
+  if (!userId) {
+    this.saveError.set('No se pudo identificar al usuario. Inicia sesión de nuevo.');
+    return;
+  }
 
-    const userId = this.userService.currentUser()?.userId;
-    if (!userId) {
-      this.saveError.set('No se pudo identificar al usuario. Inicia sesión de nuevo.');
-      return;
-    }
+  this.saving.set(true);
+  this.saveError.set(null);
 
-    const timeSlotValue = this.planForm.value.timeSlot!;
-    const request = {
-      weekId: slot.weekId,
-      foodId: this.food.id,
-      userId,
-      date: slot.date,
-      timeDay: this.timeDayMap[timeSlotValue],
-      portion: this.planForm.value.amountGrams!,
-    };
+  // Obtiene la semana actual del backend
+  this.mealPlanService.getCurrentWeek().subscribe({
+    next: (week:Week) => {
+      const selectedDay = this.planForm.value.day!;
+      const selectedTime = this.planForm.value.timeSlot!;
 
-    this.saving.set(true);
-    this.saveError.set(null);
+      const offset = { Lunes:0, Martes:1, Miércoles:2, Jueves:3, Viernes:4, Sábado:5, Domingo:6 }[selectedDay] ?? 0;
+      const date = new Date(week.startDate);
+      date.setDate(date.getDate() + offset);
+      const dateStr = date.toISOString().split('T')[0];
 
-    this.mealPlanService.addMeal(request).subscribe({
-      next: () => {
-        this.mealPlanService.clearSelectedMealSlot();
-        this.saving.set(false);
-        this.dialogRef.close(true);
-        this.router.navigate(['/meal-planner']);
-      },
-      error: (err) => {
-        console.error('Error al añadir la comida', err);
-        this.saving.set(false);
-        this.saveError.set('Ocurrió un error al guardar la comida. Intenta de nuevo.');
-      },
-    });
+      const request = {
+        weekId: week.id,
+        foodId: this.food.id,
+        userId,
+        date: dateStr,
+        timeDay: this.timeDayMap[selectedTime],
+        portion: this.planForm.value.amountGrams!,
+      };
+
+      this.mealPlanService.addMeal(request).subscribe({
+        next: () => {
+          this.saving.set(false);
+          this.mealPlanService.clearSelectedMealSlot();
+          this.dialogRef.close('added');
+        },
+        error: (err) => {
+          console.error('Error al añadir la comida', err);
+          this.saving.set(false);
+          this.saveError.set('Ocurrió un error al guardar la comida. Intenta de nuevo.');
+        },
+      });
+    },
+    error: () => {
+      this.saving.set(false);
+      this.saveError.set('No se pudo obtener la semana actual. Intenta de nuevo.');
+    },
+  });
   }
 }
