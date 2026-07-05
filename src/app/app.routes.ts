@@ -34,6 +34,10 @@ export const routes: Routes = [
       {
         path: 'profile',
         loadChildren: () => import('./pages/profile/profile.routes').then((m) => m.routes),
+      },
+      {
+        path: 'chatbot',
+        loadChildren: () => import('./pages/chatbot/chatbot.routes').then((m) => m.routes),
       }
     ],
   },

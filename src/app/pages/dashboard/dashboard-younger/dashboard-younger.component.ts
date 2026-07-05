@@ -1,4 +1,11 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  OnInit,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { UserService } from '../../../services/user.service';
@@ -39,6 +46,7 @@ export type ChartOptions = {
   selector: 'app-dashboard-younger.component',
   imports: [MatButtonModule, MatIconModule, CommonModule, ReactiveFormsModule, NgApexchartsModule],
   templateUrl: './dashboard-younger.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './dashboard-younger.component.css',
 })
 export class DashboardYoungerComponent implements OnInit {
@@ -114,9 +122,12 @@ export class DashboardYoungerComponent implements OnInit {
   }
 
   loadUserMetrics() {
-    this.metricsService.getMetrics().pipe(take(1)).subscribe((metrics) => {
-      this.userMetrics.set(metrics);
-    });
+    this.metricsService
+      .getMetrics()
+      .pipe(take(1))
+      .subscribe((metrics) => {
+        this.userMetrics.set(metrics);
+      });
   }
 
   registerWeight() {

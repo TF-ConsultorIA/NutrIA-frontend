@@ -1,4 +1,11 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  signal,
+  computed,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
@@ -14,6 +21,7 @@ import { MealDetailDialogComponent } from './dialogs/meal-detail-dialog.componen
   standalone: true,
   imports: [CommonModule],
   templateUrl: './meal-planner.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './meal-planner.css',
 })
 export class MealPlanner implements OnInit {
