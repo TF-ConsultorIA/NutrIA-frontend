@@ -21,7 +21,7 @@ export class UserService {
   initializeUser() {
     if (!this.token.isLoggedIn) {
       this.userSignal.set(null);
-      return of(null);
+      return Promise.resolve(null);
     }
     return firstValueFrom(
       this.getMe(),

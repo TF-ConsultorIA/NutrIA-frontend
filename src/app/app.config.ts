@@ -6,6 +6,7 @@ import {
   provideBrowserGlobalErrorListeners,
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { provideMarkdown } from 'ngx-markdown'
 
 import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors, withXhr } from '@angular/common/http';
@@ -21,5 +22,6 @@ export const appConfig: ApplicationConfig = {
       const userService = inject(UserService);
       return userService.initializeUser();
     }),
+    provideMarkdown()
   ],
 };

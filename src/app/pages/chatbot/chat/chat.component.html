@@ -1,8 +1,10 @@
-<div class="min-h-screen bg-[#F9FBF9] flex flex-col items-center pt-6 pb-28 px-4 relative font-sans">
-
-  <div class="w-full max-w-3xl flex flex-col flex-1 bg-transparent">
-
-    <div class="bg-white rounded-2xl p-4 flex items-center justify-between shadow-sm mb-6 w-full border border-gray-100">
+<div
+  class="h-[calc(100vh-70px)] bg-[#F9FBF9] flex flex-col items-center pt-6 pb-28 px-4 relative font-sans overflow-hidden"
+>
+  <div class="w-full max-w-5xl flex flex-col flex-1 bg-transparent min-h-0">
+    <div
+      class="bg-white rounded-2xl p-4 flex items-center justify-between shadow-sm mb-6 w-full border border-gray-100 shrink-0"
+    >
       <div class="flex items-center gap-4">
         <div class="w-12 h-12 rounded-full bg-primary flex justify-center items-center text-white">
           <mat-icon>smart_toy</mat-icon>
@@ -12,77 +14,102 @@
           <p class="text-xs text-gray-500">Tu asistente de nutrición personalizado</p>
         </div>
       </div>
-    </div>
 
-    <div class="w-full flex justify-center mb-8">
-      <div class="bg-gray-200/60 p-1 rounded-xl flex items-center w-full max-w-sm shadow-inner">
+      <div class="flex justify-center shrink-0">
+        <div class="bg-gray-200/60 p-1 rounded-xl flex items-center w-full max-w-sm shadow-inner">
+          <button
+            (click)="chatMode.set('recomendacion')"
+            [ngClass]="
+              chatMode() === 'recomendacion'
+                ? 'bg-white shadow-sm text-[#1c3d2c] font-bold'
+                : 'text-gray-500 hover:text-gray-700 font-medium'
+            "
+            class="flex-1 text-sm py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer"
+          >
+            <mat-icon class="scale-90">restaurant_menu</mat-icon> Recomendación
+          </button>
 
-        <button
-          (click)="chatMode.set('recomendacion')"
-          [ngClass]="chatMode() === 'recomendacion' ? 'bg-white shadow-sm text-[#1c3d2c] font-bold' : 'text-gray-500 hover:text-gray-700 font-medium'"
-          class="flex-1 text-sm py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer">
-          <mat-icon class="scale-90">restaurant_menu</mat-icon> Recomendación
-        </button>
-
-        <button
-          (click)="chatMode.set('soporte')"
-          [ngClass]="chatMode() === 'soporte' ? 'bg-white shadow-sm text-[#1c3d2c] font-bold' : 'text-gray-500 hover:text-gray-700 font-medium'"
-          class="flex-1 text-sm py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer">
-          <mat-icon class="scale-90">support_agent</mat-icon> Soporte
-        </button>
-
+          <button
+            (click)="chatMode.set('soporte')"
+            [ngClass]="
+              chatMode() === 'soporte'
+                ? 'bg-white shadow-sm text-[#1c3d2c] font-bold'
+                : 'text-gray-500 hover:text-gray-700 font-medium'
+            "
+            class="flex-1 text-sm py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer"
+          >
+            <mat-icon class="scale-90">support_agent</mat-icon> Soporte
+          </button>
+        </div>
       </div>
     </div>
 
-    <div class="flex flex-col w-full flex-1">
-
-      <app-bot-message time="12:17 a. m.">
-        <p class="mb-3">¡Hola! 👋 Soy NutriBot.</p>
-        @if (chatMode() === 'recomendacion') {
-          <p>Estoy listo para ayudarte a crear tu plan de comidas y darte <strong>recomendaciones nutricionales</strong> personalizadas.</p>
+    <div
+      #chatScrollContainer
+      class="flex flex-col w-full flex-1 overflow-y-auto pb-4 pr-2"
+    >
+      @for (item of messagesChat(); track $index) {
+        @if (item.sender === 'bot') {
+          <app-bot-message [time]="(item.date ?? now() | date: 'shortTime') ?? ''">
+            <markdown [data]="item.message"></markdown>
+          </app-bot-message>
         } @else {
-          <p>Estás en el área de <strong>soporte técnico</strong>. ¿Tienes algún problema con la aplicación, tu cuenta o tu suscripción?</p>
+          <app-user-message [time]="(item.date ?? now() | date: 'shortTime') ?? ''">
+            {{ item.message }}
+          </app-user-message>
         }
-      </app-bot-message>
-
-      @if (chatMode() === 'recomendacion') {
-        <app-user-message time="12:17 a. m.">
-          Dame un plan para esta semana
-        </app-user-message>
-
-        <app-bot-message time="12:17 a. m.">
-          <p class="mb-3">¡Perfecto! Aquí tienes tu plan semanal personalizado 🥩</p>
-          <p class="mb-3 text-gray-500 italic">*Basado en: peso actual: 70 kg, altura: cm*.</p>
-          <p>Puedes explorar cada día y reemplazar cualquier comida que no te convenza.</p>
-        </app-bot-message>
       }
 
+      @if (isLoading()) {
+        <app-bot-message
+          [isLoading]="true"
+          [time]="(now() | date: 'shortTime') ?? ''"
+        ></app-bot-message>
+      }
     </div>
   </div>
 
-  <div class="fixed bottom-0 left-0 w-full bg-[#F9FBF9] p-4 flex flex-col items-center border-t border-gray-200 z-10">
+  <div
+    class="fixed bottom-0 left-0 w-full bg-[#F9FBF9] p-4 flex flex-col items-center border-t border-gray-200 z-10"
+  >
     <div class="w-full max-w-3xl relative">
       <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none text-gray-400">
-        <mat-icon class="scale-90">{{ chatMode() === 'recomendacion' ? 'restaurant' : 'help_outline' }}</mat-icon>
+        <mat-icon class="scale-90">{{
+          chatMode() === 'recomendacion' ? 'restaurant' : 'help_outline'
+        }}</mat-icon>
       </div>
+      <form [formGroup]="messageForm" (ngSubmit)="sendMessage()">
+        <input
+          type="text"
+          formControlName="message"
+          [placeholder]="
+            chatMode() === 'recomendacion'
+              ? 'Escribe tu consulta nutricional...'
+              : 'Describe tu problema técnico...'
+          "
+          class="w-full pl-12 pr-14 py-4 bg-white border border-gray-200 rounded-2xl shadow-sm text-sm focus:outline-none focus:border-[#1c3d2c] focus:ring-1 focus:ring-[#1c3d2c] transition-all"
+        />
 
-      <input
-        type="text"
-        [placeholder]="chatMode() === 'recomendacion' ? 'Escribe tu consulta nutricional...' : 'Describe tu problema técnico...'"
-        class="w-full pl-12 pr-14 py-4 bg-white border border-gray-200 rounded-2xl shadow-sm text-sm focus:outline-none focus:border-[#1c3d2c] focus:ring-1 focus:ring-[#1c3d2c] transition-all"
-      />
-
-      <button class="absolute inset-y-0 right-2 flex items-center justify-center p-2 text-gray-300 hover:text-[#1c3d2c] transition-colors cursor-pointer bg-transparent border-0">
-        <div class="bg-gray-100 hover:bg-gray-200 p-2 rounded-xl flex items-center justify-center transition-colors">
-          <mat-icon class="scale-90">send</mat-icon>
-        </div>
-      </button>
+        <button
+          class="absolute inset-y-0 right-2 flex items-center justify-center p-2 text-gray-300 hover:text-[#1c3d2c] transition-colors cursor-pointer bg-transparent border-0"
+          type="submit"
+        >
+          <div
+            class="bg-gray-100 hover:bg-gray-200 p-2 rounded-xl flex items-center justify-center transition-colors"
+          >
+            <mat-icon class="scale-90">send</mat-icon>
+          </div>
+        </button>
+      </form>
     </div>
 
     <p class="text-[10px] text-gray-400 mt-3 text-center flex items-center justify-center gap-1">
       <mat-icon class="scale-75">auto_awesome</mat-icon>
-      {{ chatMode() === 'recomendacion' ? 'Respuestas generadas con IA - No reemplaza consultas médicas' : 'El soporte técnico puede demorar unos minutos en responder' }}
+      {{
+        chatMode() === 'recomendacion'
+          ? 'Respuestas generadas con IA - No reemplaza consultas médicas'
+          : 'El soporte técnico puede demorar unos minutos en responder'
+      }}
     </p>
   </div>
-
 </div>

@@ -28,13 +28,11 @@ export class AppLayoutComponent {
   private streakService = inject(UserService);
   private router = inject(Router);
 
+  protected readonly user = this.userService.currentUser;
+
   logout(): void {
     this.authService.logout().subscribe(() => {
       this.router.navigate(['/']);
     });
-  }
-
-  get user() {
-    return this.userService.currentUser();
   }
 }
