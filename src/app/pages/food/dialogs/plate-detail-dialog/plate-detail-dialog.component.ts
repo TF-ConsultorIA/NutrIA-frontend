@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FoodResponse } from '../../../../models/food';
 import { TimeDay } from '../../../../models/food-week-plan';
@@ -14,6 +14,7 @@ import { Week } from '../../../../models/week';
   selector: 'app-plate-detail-dialog.component',
   imports: [ReactiveFormsModule, CommonModule, MatIconModule],
   templateUrl: './plate-detail-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './plate-detail-dialog.component.css',
 })
 export class PlateDetailDialogComponent implements OnInit {
@@ -25,15 +26,21 @@ export class PlateDetailDialogComponent implements OnInit {
   public food: FoodResponse = inject(MAT_DIALOG_DATA);
 
   public days = signal<string[]>([
-    'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo',
+    'Lunes',
+    'Martes',
+    'Miércoles',
+    'Jueves',
+    'Viernes',
+    'Sábado',
+    'Domingo',
   ]);
   public times = signal<string[]>(['Desayuno', 'Almuerzo', 'Cena']);
 
-private readonly timeDayMap: Record<string, TimeDay> = {
-  Desayuno: 'Desayuno',
-  Almuerzo: 'Almuerzo',
-  Cena: 'Cena',
-};
+  private readonly timeDayMap: Record<string, TimeDay> = {
+    Desayuno: 'Desayuno',
+    Almuerzo: 'Almuerzo',
+    Cena: 'Cena',
+  };
 
   planForm = this.fb.group({
     day: ['', [Validators.required]],
@@ -54,8 +61,13 @@ private readonly timeDayMap: Record<string, TimeDay> = {
     const selectedMeal = this.mealPlanService.getSelectedMealSlot();
     if (selectedMeal) {
       const dayMapping: { [key: string]: string } = {
-        Lun: 'Lunes', Mar: 'Martes', Mié: 'Miércoles', Jue: 'Jueves',
-        Vie: 'Viernes', Sáb: 'Sábado', Dom: 'Domingo',
+        Lun: 'Lunes',
+        Mar: 'Martes',
+        Mié: 'Miércoles',
+        Jue: 'Jueves',
+        Vie: 'Viernes',
+        Sáb: 'Sábado',
+        Dom: 'Domingo',
       };
       const fullDayName = dayMapping[selectedMeal.dayName] || selectedMeal.dayName;
       this.planForm.patchValue({
@@ -69,9 +81,18 @@ private readonly timeDayMap: Record<string, TimeDay> = {
     if (!this.food) return;
     this.nutrients.set([
       { label: 'Calorías', value: `${this.food.energy ? this.food.energy.toFixed(1) : '-'} kcal` },
-      { label: 'Proteínas', value: `${this.food.proteins ? this.food.proteins.toFixed(1) : '-'} g` },
-      { label: 'Grasas totales', value: `${this.food.totalFat ? this.food.totalFat.toFixed(1) : '-'} g` },
-      { label: 'Carbohidratos totales', value: `${this.food.carbohydratesTotal ? this.food.carbohydratesTotal.toFixed(1) : '-'} g` },
+      {
+        label: 'Proteínas',
+        value: `${this.food.proteins ? this.food.proteins.toFixed(1) : '-'} g`,
+      },
+      {
+        label: 'Grasas totales',
+        value: `${this.food.totalFat ? this.food.totalFat.toFixed(1) : '-'} g`,
+      },
+      {
+        label: 'Carbohidratos totales',
+        value: `${this.food.carbohydratesTotal ? this.food.carbohydratesTotal.toFixed(1) : '-'} g`,
+      },
       { label: 'Calcio', value: `${this.food.calcium ? this.food.calcium.toFixed(1) : '-'} g` },
       { label: 'Hierro', value: `${this.food.iron ? this.food.iron.toFixed(1) : '-'} g` },
       { label: 'Sodio', value: `${this.food.sodium ? this.food.sodium.toFixed(1) : '-'} g` },
@@ -84,54 +105,57 @@ private readonly timeDayMap: Record<string, TimeDay> = {
   }
 
   onAdd(): void {
-  if (this.planForm.invalid) return;
+    if (this.planForm.invalid) return;
 
-  const userId = this.userService.currentUser()?.userId;
-  if (!userId) {
-    this.saveError.set('No se pudo identificar al usuario. Inicia sesión de nuevo.');
-    return;
-  }
+    const userId = this.userService.currentUser()?.userId;
+    if (!userId) {
+      this.saveError.set('No se pudo identificar al usuario. Inicia sesión de nuevo.');
+      return;
+    }
 
-  this.saving.set(true);
-  this.saveError.set(null);
+    this.saving.set(true);
+    this.saveError.set(null);
 
-  // Obtiene la semana actual del backend
-  this.mealPlanService.getCurrentWeek().subscribe({
-    next: (week:Week) => {
-      const selectedDay = this.planForm.value.day!;
-      const selectedTime = this.planForm.value.timeSlot!;
+    // Obtiene la semana actual del backend
+    this.mealPlanService.getCurrentWeek().subscribe({
+      next: (week: Week) => {
+        const selectedDay = this.planForm.value.day!;
+        const selectedTime = this.planForm.value.timeSlot!;
 
-      const offset = { Lunes:0, Martes:1, Miércoles:2, Jueves:3, Viernes:4, Sábado:5, Domingo:6 }[selectedDay] ?? 0;
-      const date = new Date(week.startDate);
-      date.setDate(date.getDate() + offset);
-      const dateStr = date.toISOString().split('T')[0];
+        const offset =
+          { Lunes: 0, Martes: 1, Miércoles: 2, Jueves: 3, Viernes: 4, Sábado: 5, Domingo: 6 }[
+            selectedDay
+          ] ?? 0;
+        const date = new Date(week.startDate);
+        date.setDate(date.getDate() + offset);
+        const dateStr = date.toISOString().split('T')[0];
 
-      const request = {
-        weekId: week.id,
-        foodId: this.food.id,
-        userId,
-        date: dateStr,
-        timeDay: this.timeDayMap[selectedTime],
-        portion: this.planForm.value.amountGrams!,
-      };
+        const request = {
+          weekId: week.id,
+          foodId: this.food.id,
+          userId,
+          date: dateStr,
+          timeDay: this.timeDayMap[selectedTime],
+          portion: this.planForm.value.amountGrams!,
+        };
 
-      this.mealPlanService.addMeal(request).subscribe({
-        next: () => {
-          this.saving.set(false);
-          this.mealPlanService.clearSelectedMealSlot();
-          this.dialogRef.close('added');
-        },
-        error: (err) => {
-          console.error('Error al añadir la comida', err);
-          this.saving.set(false);
-          this.saveError.set('Ocurrió un error al guardar la comida. Intenta de nuevo.');
-        },
-      });
-    },
-    error: () => {
-      this.saving.set(false);
-      this.saveError.set('No se pudo obtener la semana actual. Intenta de nuevo.');
-    },
-  });
+        this.mealPlanService.addMeal(request).subscribe({
+          next: () => {
+            this.saving.set(false);
+            this.mealPlanService.clearSelectedMealSlot();
+            this.dialogRef.close('added');
+          },
+          error: (err) => {
+            console.error('Error al añadir la comida', err);
+            this.saving.set(false);
+            this.saveError.set('Ocurrió un error al guardar la comida. Intenta de nuevo.');
+          },
+        });
+      },
+      error: () => {
+        this.saving.set(false);
+        this.saveError.set('No se pudo obtener la semana actual. Intenta de nuevo.');
+      },
+    });
   }
 }
