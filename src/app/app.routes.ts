@@ -5,6 +5,7 @@ import { noAuthGuard } from './core/guards/no-auth.guard';
 import { AppLayoutComponent } from './layouts/app-layout/app-layout.component';
 import { FoodSearchWrapperComponent } from './pages/food/food-search-wrapper/food-search-wrapper.component';
 
+
 export const routes: Routes = [
   { path: '', redirectTo: '/auth/login', pathMatch: 'full' },
   {
@@ -34,6 +35,11 @@ export const routes: Routes = [
       {
         path: 'profile',
         loadChildren: () => import('./pages/profile/profile.routes').then((m) => m.routes),
+      },
+      {
+        path: 'settings',
+        loadChildren: () =>
+          import('./pages/profile-settings/profile-settings.routes').then((m) => m.routes),
       }
     ],
   },
