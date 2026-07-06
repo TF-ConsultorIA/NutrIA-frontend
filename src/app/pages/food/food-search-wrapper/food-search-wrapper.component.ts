@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 
@@ -7,6 +7,7 @@ import { filter } from 'rxjs';
   selector: 'app-food-search-wrapper.component',
   imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule],
   templateUrl: './food-search-wrapper.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './food-search-wrapper.component.css',
 })
 export class FoodSearchWrapperComponent implements OnInit {

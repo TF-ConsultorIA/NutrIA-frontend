@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FoodResponse } from '../../../../models/food';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
   selector: 'app-ingredient-detail-dialog.component',
   imports: [MatIconModule],
   templateUrl: './ingredient-detail-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './ingredient-detail-dialog.component.css',
 })
 export class IngredientDetailDialogComponent {

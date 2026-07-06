@@ -1,9 +1,23 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
-import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { catchError, debounceTime, distinctUntilChanged, filter, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
+import {
+  MatAutocompleteModule,
+  MatAutocompleteSelectedEvent,
+} from '@angular/material/autocomplete';
+import {
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+  forkJoin,
+  map,
+  Observable,
+  of,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { PreferenceService } from '../../../services/preference.service';
 import { MedicalReportService } from '../../../services/medical-report.service';
 import { FoodService } from '../../../services/food.service';
@@ -22,7 +36,8 @@ interface PreferenceDisplay {
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, MatIconModule, MatAutocompleteModule],
   templateUrl: './profile-main.component.html',
-  styleUrl: './profile-main.component.css'
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styleUrl: './profile-main.component.css',
 })
 export class ProfileMainComponent implements OnInit {
   private preferenceService = inject(PreferenceService);
@@ -65,11 +80,13 @@ export class ProfileMainComponent implements OnInit {
     return control.valueChanges.pipe(
       debounceTime(300),
       distinctUntilChanged(),
-      filter(val => typeof val === 'string' && val.length > 1),
-      switchMap(val => this.foodService.searchPlates(val, FoodType.INGREDIENT, 0, 10).pipe(
-        map(res => res.content),
-        catchError(() => of([]))
-      ))
+      filter((val) => typeof val === 'string' && val.length > 1),
+      switchMap((val) =>
+        this.foodService.searchPlates(val, FoodType.INGREDIENT, 0, 10).pipe(
+          map((res) => res.content),
+          catchError(() => of([])),
+        ),
+      ),
     );
   }
 
@@ -78,31 +95,31 @@ export class ProfileMainComponent implements OnInit {
   }
 
   private loadPreferences() {
-    this.preferenceService.getPreferences().subscribe(res => {
-      this.resolveFoodNames(res.allergies).subscribe(data => this.alergias = data);
-      this.resolveFoodNames(res.liked).subscribe(data => this.agrada = data);
-      this.resolveFoodNames(res.disliked).subscribe(data => this.noAgrada = data);
+    this.preferenceService.getPreferences().subscribe((res) => {
+      this.resolveFoodNames(res.allergies).subscribe((data) => (this.alergias = data));
+      this.resolveFoodNames(res.liked).subscribe((data) => (this.agrada = data));
+      this.resolveFoodNames(res.disliked).subscribe((data) => (this.noAgrada = data));
     });
   }
 
   private resolveFoodNames(items: PreferenceItemDto[]): Observable<PreferenceDisplay[]> {
     if (!items || items.length === 0) return of([]);
-    const requests = items.map(item => 
+    const requests = items.map((item) =>
       this.foodService.getFoodById(item.foodId).pipe(
-        map(food => ({
+        map((food) => ({
           id: item.id,
           foodId: item.foodId,
-          foodName: food.foodName
+          foodName: food.foodName,
         })),
-        catchError(() => of({ id: item.id, foodId: item.foodId, foodName: 'Desconocido' }))
-      )
+        catchError(() => of({ id: item.id, foodId: item.foodId, foodName: 'Desconocido' })),
+      ),
     );
     return forkJoin(requests);
   }
 
   onAlergiaSelected(event: MatAutocompleteSelectedEvent) {
     const food: FoodResponse = event.option.value;
-    this.preferenceService.addPreference({ foodId: food.id, type: 'allergy' }).subscribe(pref => {
+    this.preferenceService.addPreference({ foodId: food.id, type: 'allergy' }).subscribe((pref) => {
       this.alergias.push({ id: pref.id, foodId: pref.foodId, foodName: food.foodName });
       this.alergiaCtrl.setValue('');
     });
@@ -110,13 +127,13 @@ export class ProfileMainComponent implements OnInit {
 
   removeAlergia(item: PreferenceDisplay) {
     this.preferenceService.deletePreference(item.id).subscribe(() => {
-      this.alergias = this.alergias.filter(a => a.id !== item.id);
+      this.alergias = this.alergias.filter((a) => a.id !== item.id);
     });
   }
 
   onAgradaSelected(event: MatAutocompleteSelectedEvent) {
     const food: FoodResponse = event.option.value;
-    this.preferenceService.addPreference({ foodId: food.id, type: 'liked' }).subscribe(pref => {
+    this.preferenceService.addPreference({ foodId: food.id, type: 'liked' }).subscribe((pref) => {
       this.agrada.push({ id: pref.id, foodId: pref.foodId, foodName: food.foodName });
       this.agradaCtrl.setValue('');
     });
@@ -124,26 +141,28 @@ export class ProfileMainComponent implements OnInit {
 
   removeAgrada(item: PreferenceDisplay) {
     this.preferenceService.deletePreference(item.id).subscribe(() => {
-      this.agrada = this.agrada.filter(a => a.id !== item.id);
+      this.agrada = this.agrada.filter((a) => a.id !== item.id);
     });
   }
 
   onNoAgradaSelected(event: MatAutocompleteSelectedEvent) {
     const food: FoodResponse = event.option.value;
-    this.preferenceService.addPreference({ foodId: food.id, type: 'disliked' }).subscribe(pref => {
-      this.noAgrada.push({ id: pref.id, foodId: pref.foodId, foodName: food.foodName });
-      this.noAgradaCtrl.setValue('');
-    });
+    this.preferenceService
+      .addPreference({ foodId: food.id, type: 'disliked' })
+      .subscribe((pref) => {
+        this.noAgrada.push({ id: pref.id, foodId: pref.foodId, foodName: food.foodName });
+        this.noAgradaCtrl.setValue('');
+      });
   }
 
   removeNoAgrada(item: PreferenceDisplay) {
     this.preferenceService.deletePreference(item.id).subscribe(() => {
-      this.noAgrada = this.noAgrada.filter(a => a.id !== item.id);
+      this.noAgrada = this.noAgrada.filter((a) => a.id !== item.id);
     });
   }
 
   private loadMedicalReports() {
-    this.medicalService.getMedicalReports(0, 10).subscribe(res => {
+    this.medicalService.getMedicalReports(0, 10).subscribe((res) => {
       this.medicalReports = res.content;
     });
   }
@@ -161,7 +180,7 @@ export class ProfileMainComponent implements OnInit {
         error: () => {
           this.isUploading = false;
           alert('Error al subir el archivo');
-        }
+        },
       });
     }
   }

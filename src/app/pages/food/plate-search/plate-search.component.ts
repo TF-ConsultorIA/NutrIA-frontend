@@ -1,5 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  OnInit,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,6 +23,7 @@ import { PlateDetailDialogComponent } from '../dialogs/plate-detail-dialog/plate
   selector: 'app-plate-search.component',
   imports: [MatIconModule, ReactiveFormsModule, CommonModule],
   templateUrl: './plate-search.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './plate-search.component.css',
 })
 export class PlateSearchComponent implements OnInit {

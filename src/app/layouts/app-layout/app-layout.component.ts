@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -19,6 +19,7 @@ import { UserService } from '../../services/user.service';
     RouterLink,
   ],
   templateUrl: './app-layout.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './app-layout.component.css',
 })
 export class AppLayoutComponent {
@@ -27,13 +28,11 @@ export class AppLayoutComponent {
   private streakService = inject(UserService);
   private router = inject(Router);
 
+  protected readonly user = this.userService.currentUser;
+
   logout(): void {
     this.authService.logout().subscribe(() => {
       this.router.navigate(['/']);
     });
-  }
-
-  get user() {
-    return this.userService.currentUser();
   }
 }

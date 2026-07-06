@@ -40,6 +40,10 @@ export const routes: Routes = [
         path: 'settings',
         loadChildren: () =>
           import('./pages/profile-settings/profile-settings.routes').then((m) => m.routes),
+      },
+      {
+        path: 'chatbot',
+        loadChildren: () => import('./pages/chatbot/chatbot.routes').then((m) => m.routes),
       }
     ],
   },
