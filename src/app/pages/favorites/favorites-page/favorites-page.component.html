@@ -1,0 +1,78 @@
+<div class="max-w-7xl mx-auto p-4 md:p-8 space-y-8 min-h-screen fade-up-enter">
+  <!-- Header -->
+  <div class="space-y-2 pt-2">
+    <p class="text-xs font-bold uppercase tracking-widest text-primary">Recetas guardadas</p>
+    <h1 class="text-4xl font-black text-[#1c3d2c]">
+      Tus <span class="text-primary">favoritos</span>
+    </h1>
+    <p class="text-gray-500 text-sm max-w-2xl leading-relaxed">
+      Todas las recetas favoritas de tu grupo familiar en un solo lugar.
+    </p>
+  </div>
+
+  <!-- Counter -->
+  <div class="flex items-center gap-2">
+    <mat-icon class="text-amber-500" style="font-size: 20px; width: 20px; height: 20px;">star</mat-icon>
+    <span class="text-lg font-black text-[#1c3d2c]">
+      {{ favorites.length }} receta{{ favorites.length !== 1 ? 's' : '' }} favorita{{ favorites.length !== 1 ? 's' : '' }}
+    </span>
+  </div>
+
+  <!-- Loading state -->
+  @if (isLoading) {
+    <div class="flex flex-col items-center justify-center py-20 text-gray-400">
+      <mat-icon class="scale-150 animate-spin mb-4">sync</mat-icon>
+      <p class="text-sm">Cargando favoritos...</p>
+    </div>
+  }
+
+  <!-- Empty state -->
+  @if (!isLoading && favorites.length === 0) {
+    <div
+      class="flex flex-col items-center justify-center text-center p-12 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50/50"
+    >
+      <div
+        class="w-14 h-14 rounded-full bg-amber-50 flex justify-center items-center text-amber-400 mb-4"
+      >
+        <mat-icon class="scale-125">star_border</mat-icon>
+      </div>
+      <h3 class="text-[#1c3d2c] font-bold text-lg mb-1">Sin recetas favoritas</h3>
+      <p class="text-gray-400 text-sm max-w-sm">
+        Aún no has marcado ninguna receta como favorita. Ve a
+        <a routerLink="/food/plate" class="text-primary font-bold hover:underline">Buscar recetas</a>
+        y marca tus favoritas con la estrella.
+      </p>
+    </div>
+  }
+
+  <!-- Favorites grid -->
+  @if (!isLoading && favorites.length > 0) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 fade-up-enter delay-150">
+      @for (item of favorites; track item.id) {
+        <div
+          class="bg-white rounded-2xl p-4 shadow-xs border border-gray-100 flex items-center justify-between gap-3 hover:border-[#a8f0c8] hover:shadow-md transition-all group"
+        >
+          <div class="flex items-center gap-3 min-w-0">
+            <mat-icon class="text-amber-500 shrink-0" style="font-size: 18px; width: 18px; height: 18px;">star</mat-icon>
+            <div class="min-w-0">
+              <h4 class="font-bold text-[#1c3d2c] text-sm truncate group-hover:text-primary transition-colors">
+                {{ item.foodName }}
+              </h4>
+              @if (item.addedDate) {
+                <p class="text-xs text-gray-400">Agregado el {{ item.addedDate | date:'dd/MM/yyyy' }}</p>
+              }
+            </div>
+          </div>
+
+          <button
+            (click)="removeFavorite(item)"
+            class="flex items-center gap-1 px-3 py-1.5 rounded-xl text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all cursor-pointer bg-transparent border-none shrink-0"
+          >
+            <mat-icon style="font-size: 14px; width: 14px; height: 14px;">delete_outline</mat-icon>
+            <span class="text-[11px] font-bold">Quitar</span>
+          </button>
+        </div>
+      }
+    </div>
+  }
+</div>
