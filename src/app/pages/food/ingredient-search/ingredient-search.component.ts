@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { PageResponse } from '../../../models/page-response';
@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-ingredient-search.component',
   imports: [MatIconModule, ReactiveFormsModule, CommonModule],
   templateUrl: './ingredient-search.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './ingredient-search.component.css',
 })
 export class IngredientSearchComponent {

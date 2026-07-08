@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -11,6 +11,7 @@ import { MealPlanService } from '../../../../services/meal-plan.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, MatIconModule],
   templateUrl: './meal-detail-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './meal-detail-dialog.component.css',
 })
 export class MealDetailDialogComponent implements OnInit {
@@ -39,7 +40,10 @@ export class MealDetailDialogComponent implements OnInit {
       { label: 'Calorías', value: `${food.energy ? food.energy.toFixed(1) : '-'} kcal` },
       { label: 'Proteínas', value: `${food.proteins ? food.proteins.toFixed(1) : '-'} g` },
       { label: 'Grasas totales', value: `${food.totalFat ? food.totalFat.toFixed(1) : '-'} g` },
-      { label: 'Carbohidratos totales', value: `${food.carbohydratesTotal ? food.carbohydratesTotal.toFixed(1) : '-'} g` },
+      {
+        label: 'Carbohidratos totales',
+        value: `${food.carbohydratesTotal ? food.carbohydratesTotal.toFixed(1) : '-'} g`,
+      },
       { label: 'Calcio', value: `${food.calcium ? food.calcium.toFixed(1) : '-'} g` },
       { label: 'Hierro', value: `${food.iron ? food.iron.toFixed(1) : '-'} g` },
       { label: 'Sodio', value: `${food.sodium ? food.sodium.toFixed(1) : '-'} g` },
@@ -61,17 +65,19 @@ export class MealDetailDialogComponent implements OnInit {
     this.saving.set(true);
     this.errorMsg.set(null);
 
-    this.mealPlanService.updatePortion(this.plan.id, { portion: this.portionForm.value.portion! }).subscribe({
-      next: () => {
-        this.saving.set(false);
-        this.dialogRef.close('updated');
-      },
-      error: (err) => {
-        console.error('Error al actualizar la porción', err);
-        this.saving.set(false);
-        this.errorMsg.set('No se pudo actualizar la porción. Intenta de nuevo.');
-      },
-    });
+    this.mealPlanService
+      .updatePortion(this.plan.id, { portion: this.portionForm.value.portion! })
+      .subscribe({
+        next: () => {
+          this.saving.set(false);
+          this.dialogRef.close('updated');
+        },
+        error: (err) => {
+          console.error('Error al actualizar la porción', err);
+          this.saving.set(false);
+          this.errorMsg.set('No se pudo actualizar la porción. Intenta de nuevo.');
+        },
+      });
   }
 
   onDelete(): void {
