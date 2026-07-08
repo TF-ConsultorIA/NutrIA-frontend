@@ -29,6 +29,10 @@ export const routes: Routes = [
         loadChildren: () => import('./pages/food/food.routes').then((m) => m.routes),
       },
       {
+        path: 'favoritos',
+        loadChildren: () => import('./pages/favorites/favorites.routes').then((m) => m.routes),
+      },
+      {
         path: 'meal-planner',
         loadChildren: () => import('./pages/meal-planner/meal-planner.routes').then((m) => m.routes),
       },
