@@ -101,10 +101,12 @@
           <mat-icon class="scale-[2]">restaurant_menu</mat-icon>
 
           <button
-            (click)="addFavorite(recipe.id)"
-            class="absolute top-3 left-3 w-8 Fly h-8 rounded-full hover:translate-0.5 bg-white flex justify-center items-center shadow-xs cursor-pointer transition-transform active:scale-95 text-amber-500"
+            (click)="toggleFavorite(recipe); $event.stopPropagation()"
+            class="absolute top-3 left-3 w-8 h-8 rounded-full bg-white flex justify-center items-center shadow-xs cursor-pointer transition-all active:scale-95 hover:scale-110"
+            [class.text-amber-500]="isFavorite(recipe.id)"
+            [class.text-gray-400]="!isFavorite(recipe.id)"
           >
-            <mat-icon class="scale-90"> star </mat-icon>
+            <mat-icon class="scale-90">{{ isFavorite(recipe.id) ? 'star' : 'star_border' }}</mat-icon>
           </button>
         </div>
 

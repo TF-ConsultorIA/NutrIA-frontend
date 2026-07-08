@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,7 +16,6 @@ import {
   Observable,
   of,
   switchMap,
-  tap,
 } from 'rxjs';
 import { PreferenceService } from '../../../services/preference.service';
 import { MedicalReportService } from '../../../services/medical-report.service';
@@ -36,13 +35,13 @@ interface PreferenceDisplay {
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, MatIconModule, MatAutocompleteModule],
   templateUrl: './profile-main.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './profile-main.component.css',
 })
 export class ProfileMainComponent implements OnInit {
   private preferenceService = inject(PreferenceService);
   private medicalService = inject(MedicalReportService);
   private foodService = inject(FoodService);
+  private cdr = inject(ChangeDetectorRef);
 
   activeTab: 'medicos' | 'preferencias' = 'preferencias';
 
@@ -95,10 +94,26 @@ export class ProfileMainComponent implements OnInit {
   }
 
   private loadPreferences() {
-    this.preferenceService.getPreferences().subscribe((res) => {
-      this.resolveFoodNames(res.allergies).subscribe((data) => (this.alergias = data));
-      this.resolveFoodNames(res.liked).subscribe((data) => (this.agrada = data));
-      this.resolveFoodNames(res.disliked).subscribe((data) => (this.noAgrada = data));
+    this.preferenceService.getPreferences().pipe(
+      switchMap((res) => {
+        const allergies$ = this.resolveFoodNames(res.allergies);
+        const liked$ = this.resolveFoodNames(res.liked);
+        const disliked$ = this.resolveFoodNames(res.disliked);
+        return forkJoin({ allergies: allergies$, liked: liked$, disliked: disliked$ });
+      }),
+    ).subscribe({
+      next: (resolved) => {
+        this.alergias = resolved.allergies;
+        this.agrada = resolved.liked;
+        this.noAgrada = resolved.disliked;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.alergias = [];
+        this.agrada = [];
+        this.noAgrada = [];
+        this.cdr.markForCheck();
+      },
     });
   }
 
@@ -120,28 +135,32 @@ export class ProfileMainComponent implements OnInit {
   onAlergiaSelected(event: MatAutocompleteSelectedEvent) {
     const food: FoodResponse = event.option.value;
     this.preferenceService.addPreference({ foodId: food.id, type: 'allergy' }).subscribe((pref) => {
-      this.alergias.push({ id: pref.id, foodId: pref.foodId, foodName: food.foodName });
+      this.alergias = [...this.alergias, { id: pref.id, foodId: pref.foodId, foodName: food.foodName }];
       this.alergiaCtrl.setValue('');
+      this.cdr.markForCheck();
     });
   }
 
   removeAlergia(item: PreferenceDisplay) {
     this.preferenceService.deletePreference(item.id).subscribe(() => {
       this.alergias = this.alergias.filter((a) => a.id !== item.id);
+      this.cdr.markForCheck();
     });
   }
 
   onAgradaSelected(event: MatAutocompleteSelectedEvent) {
     const food: FoodResponse = event.option.value;
     this.preferenceService.addPreference({ foodId: food.id, type: 'liked' }).subscribe((pref) => {
-      this.agrada.push({ id: pref.id, foodId: pref.foodId, foodName: food.foodName });
+      this.agrada = [...this.agrada, { id: pref.id, foodId: pref.foodId, foodName: food.foodName }];
       this.agradaCtrl.setValue('');
+      this.cdr.markForCheck();
     });
   }
 
   removeAgrada(item: PreferenceDisplay) {
     this.preferenceService.deletePreference(item.id).subscribe(() => {
       this.agrada = this.agrada.filter((a) => a.id !== item.id);
+      this.cdr.markForCheck();
     });
   }
 
@@ -150,20 +169,23 @@ export class ProfileMainComponent implements OnInit {
     this.preferenceService
       .addPreference({ foodId: food.id, type: 'disliked' })
       .subscribe((pref) => {
-        this.noAgrada.push({ id: pref.id, foodId: pref.foodId, foodName: food.foodName });
+        this.noAgrada = [...this.noAgrada, { id: pref.id, foodId: pref.foodId, foodName: food.foodName }];
         this.noAgradaCtrl.setValue('');
+        this.cdr.markForCheck();
       });
   }
 
   removeNoAgrada(item: PreferenceDisplay) {
     this.preferenceService.deletePreference(item.id).subscribe(() => {
       this.noAgrada = this.noAgrada.filter((a) => a.id !== item.id);
+      this.cdr.markForCheck();
     });
   }
 
   private loadMedicalReports() {
     this.medicalService.getMedicalReports(0, 10).subscribe((res) => {
       this.medicalReports = res.content;
+      this.cdr.markForCheck();
     });
   }
 
@@ -174,11 +196,13 @@ export class ProfileMainComponent implements OnInit {
       const today = new Date().toISOString().split('T')[0];
       this.medicalService.uploadReport(file, today).subscribe({
         next: (report) => {
-          this.medicalReports.unshift(report);
+          this.medicalReports = [report, ...this.medicalReports];
           this.isUploading = false;
+          this.cdr.markForCheck();
         },
         error: () => {
           this.isUploading = false;
+          this.cdr.markForCheck();
           alert('Error al subir el archivo');
         },
       });
