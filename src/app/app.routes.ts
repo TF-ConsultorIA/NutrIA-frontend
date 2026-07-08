@@ -5,6 +5,7 @@ import { noAuthGuard } from './core/guards/no-auth.guard';
 import { AppLayoutComponent } from './layouts/app-layout/app-layout.component';
 import { FoodSearchWrapperComponent } from './pages/food/food-search-wrapper/food-search-wrapper.component';
 
+
 export const routes: Routes = [
   { path: '', redirectTo: '/auth/login', pathMatch: 'full' },
   {
@@ -28,12 +29,25 @@ export const routes: Routes = [
         loadChildren: () => import('./pages/food/food.routes').then((m) => m.routes),
       },
       {
+        path: 'favoritos',
+        loadChildren: () => import('./pages/favorites/favorites.routes').then((m) => m.routes),
+      },
+      {
         path: 'meal-planner',
         loadChildren: () => import('./pages/meal-planner/meal-planner.routes').then((m) => m.routes),
       },
       {
         path: 'profile',
         loadChildren: () => import('./pages/profile/profile.routes').then((m) => m.routes),
+      },
+      {
+        path: 'settings',
+        loadChildren: () =>
+          import('./pages/profile-settings/profile-settings.routes').then((m) => m.routes),
+      },
+      {
+        path: 'chatbot',
+        loadChildren: () => import('./pages/chatbot/chatbot.routes').then((m) => m.routes),
       }
     ],
   },

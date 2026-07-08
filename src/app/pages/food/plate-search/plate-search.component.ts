@@ -1,5 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
@@ -70,6 +76,9 @@ export class PlateSearchComponent implements OnInit {
   private plateResults = signal<PageResponse<FoodResponse> | null>(null);
   public results = this.plateResults.asReadonly();
 
+  /** Map of foodId → favoriteId for quick lookup */
+  public favoriteLookup = signal<Map<number, number>>(new Map());
+
   public searchForm = this.fb.group({
     query: [''],
     minCalories: [''],
@@ -78,7 +87,56 @@ export class PlateSearchComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    this.loadFavorites();
     this.loadPlates();
+  }
+
+  /** Load all user favorites into the lookup map */
+  private loadFavorites() {
+    this.favoriteService.getFavorites(0, 500).pipe(take(1)).subscribe({
+      next: (res) => {
+        const map = new Map<number, number>();
+        res.content.forEach((fav) => map.set(fav.foodId, fav.id));
+        this.favoriteLookup.set(map);
+      },
+      error: () => {
+        this.favoriteLookup.set(new Map());
+      },
+    });
+  }
+
+  isFavorite(foodId: number): boolean {
+    return this.favoriteLookup().has(foodId);
+  }
+
+  toggleFavorite(recipe: FoodResponse) {
+    if (this.isFavorite(recipe.id)) {
+      const favoriteId = this.favoriteLookup().get(recipe.id)!;
+      this.favoriteService.removeFavorite(favoriteId).pipe(take(1)).subscribe({
+        next: () => {
+          const updated = new Map(this.favoriteLookup());
+          updated.delete(recipe.id);
+          this.favoriteLookup.set(updated);
+          this._snackBar.open('Receta removida de favoritos', 'Cerrar', { duration: 3000 });
+        },
+        error: () => {
+          this._snackBar.open('Error al remover de favoritos', 'Cerrar', { duration: 3000 });
+        },
+      });
+    } else {
+      const request: FavoriteCreateRequestDto = { foodId: recipe.id };
+      this.favoriteService.addFavorite(request).pipe(take(1)).subscribe({
+        next: (fav) => {
+          const updated = new Map(this.favoriteLookup());
+          updated.set(recipe.id, fav.id);
+          this.favoriteLookup.set(updated);
+          this._snackBar.open('Receta agregada a favoritos', 'Cerrar', { duration: 3000 });
+        },
+        error: () => {
+          this._snackBar.open('Este plato ya está en favoritos', 'Cerrar', { duration: 3000 });
+        },
+      });
+    }
   }
 
   loadPlates() {
@@ -140,22 +198,6 @@ export class PlateSearchComponent implements OnInit {
   triggerSearchFromZero(): void {
     this.currentPage.set(0);
     this.loadPlates();
-  }
-
-  addFavorite(foodId: number) {
-    let request: FavoriteCreateRequestDto = { foodId: foodId };
-
-    this.favoriteService
-      .addFavorite(request)
-      .pipe(take(1))
-      .subscribe({
-        next: () => {
-          this._snackBar.open('Plato agregado a favoritos', 'Cerrar', { duration: 3000 });
-        },
-        error: () => {
-          this._snackBar.open('Este plato ya esta en favoritos', 'Cerrar', { duration: 3000 });
-        },
-      });
   }
 
   isFirstPage() {

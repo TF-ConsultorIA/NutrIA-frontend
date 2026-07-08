@@ -11,20 +11,29 @@ import { FavoriteCreateRequestDto, FavoriteResponse } from '../models/favorite';
 export class FavoriteService {
   private http = inject(HttpClient);
   private userService = inject(UserService);
-  private userId = this.userService.currentUser()?.userId;
-  private baseUrl = `${environment.apiUrl}/profiles/${this.userId}/favorites`;
 
-  getFavorites(size: number = 10, page: number = 1) {
-    const params = new HttpParams().set('size', size).set('page', page);
+  private get profileId() {
+    return this.userService.currentUser()?.userId;
+  }
 
-    return this.http.get<PageResponse<FavoriteResponse>>(this.baseUrl, { params: params });
+  getFavorites(page: number = 0, size: number = 10) {
+    const params = new HttpParams().set('page', page).set('size', size);
+    return this.http.get<PageResponse<FavoriteResponse>>(
+      `${environment.apiUrl}/profiles/${this.profileId}/favorites`,
+      { params },
+    );
   }
 
   addFavorite(request: FavoriteCreateRequestDto) {
-    return this.http.post<FavoriteResponse>(this.baseUrl, request);
+    return this.http.post<FavoriteResponse>(
+      `${environment.apiUrl}/profiles/${this.profileId}/favorites`,
+      request,
+    );
   }
 
   removeFavorite(favoriteId: number) {
-    return this.http.delete(`${this.baseUrl}/${favoriteId}`);
+    return this.http.delete(
+      `${environment.apiUrl}/profiles/${this.profileId}/favorites/${favoriteId}`,
+    );
   }
 }

@@ -16,7 +16,7 @@
 
       <h1 class="text-4xl md:text-5xl font-extrabold text-white leading-tight mb-4">
         ¡Buenas noches,<br />
-        <span class="text-[#A8F0C8]">{{ user?.name | titlecase }}</span>
+        <span class="text-[#A8F0C8]">{{ $safeNavigationMigration(user?.name) | titlecase }}</span>
       </h1>
 
       <p class="text-white/80 max-w-lg mb-8 text-sm md:text-base">
@@ -66,7 +66,11 @@
           <div>
             <p class="text-white/70 text-xs">Última actualización</p>
             <p class="text-white font-bold text-lg leading-tight">
-              {{ lastWeight() ? (lastWeight()?.registerDate | date: 'dd-MMM') : 'Sin registros' }}
+              {{
+                lastWeight()
+                  ? ($safeNavigationMigration(lastWeight()?.registerDate) | date: 'dd-MMM')
+                  : 'Sin registros'
+              }}
             </p>
             <p class="text-white/70 text-xs">métricas</p>
           </div>
@@ -148,9 +152,14 @@
               <div class="flex items-center gap-2 text-xs">
                 @if (lastWeight()) {
                   <span class="text-gray-500"
-                    >{{ lastWeight()?.registerDate === (currentDate | date: 'yyyy-MM-dd') ? 'Hoy' : 'Último registro' }}:
-                    <strong class="text-[#1c3d2c]">{{ lastWeight()?.weightKg }} kg</strong> •
-                    {{ lastWeight()?.registerDate | date: 'dd-MMM' }}</span
+                    >{{
+                      lastWeight()?.registerDate === (currentDate | date: 'yyyy-MM-dd')
+                        ? 'Hoy'
+                        : 'Último registro'
+                    }}: <strong class="text-[#1c3d2c]">{{ lastWeight()?.weightKg }} kg</strong> •
+                    {{
+                      $safeNavigationMigration(lastWeight()?.registerDate) | date: 'dd-MMM'
+                    }}</span
                   >
                   @if (weighChange() !== null) {
                     <span
@@ -182,11 +191,11 @@
             type="submit"
             class="bg-[#1c3d2c] hover:bg-primary text-white text-sm font-bold py-2 px-5 rounded-xl flex items-center gap-2 transition-colors cursor-pointer"
           >
-          @if (lastWeight()?.registerDate === (currentDate | date: 'yyyy-MM-dd')) {
-            <mat-icon class="scale-75">edit</mat-icon> Editar
-          } @else {
-            <mat-icon class="scale-75">add</mat-icon> Registrar
-          }
+            @if (lastWeight()?.registerDate === (currentDate | date: 'yyyy-MM-dd')) {
+              <mat-icon class="scale-75">edit</mat-icon> Editar
+            } @else {
+              <mat-icon class="scale-75">add</mat-icon> Registrar
+            }
           </button>
         </form>
       </div>

@@ -22,9 +22,10 @@ import { Gender } from '../../../models/gender';
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatIconModule
+    MatIconModule,
   ],
   templateUrl: './register.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './register.component.css',
 })
 export class RegisterComponent {

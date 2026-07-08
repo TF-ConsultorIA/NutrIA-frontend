@@ -62,7 +62,7 @@ export class AuthService {
   }
 
   changePassword(request: ChangePasswordRequest) {
-    return this.http.post<ChangeCredentialsResponse>(`${this.baseUrl}/change-password`, request).pipe(
+    return this.http.put<ChangeCredentialsResponse>(`${this.baseUrl}/change-password`, request).pipe(
       tap((res) => {
         this.token.save(res.accessToken, res.refreshToken, res.email, res.role, res.accessExpiresInMs);
       }),
